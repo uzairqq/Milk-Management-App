@@ -1,16 +1,25 @@
 import React, { Component } from "react";
 import "./App.css";
 import axios from "axios";
+import { Table } from "reactstrap";
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       customerTypeId: 0,
+      customerType: "",
       customerName: "",
       customerAddress: "",
-      customerContact: ""
+      customerContact: "",
+      customers: []
     };
+  }
+  componentDidMount() {
+    axios.get(`http://localhost:56996/api/Customer/all`).then(res => {
+      const customers = res.data;
+      this.setState({ customers });
+    });
   }
   handleSubmit = e => {
     e.preventDefault();
@@ -86,6 +95,31 @@ class App extends Component {
           <br />
           <button type="submit">Delete</button>
         </form>
+        <div>
+          <Table striped>
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Customer Type</th>
+                <th>Customer Name</th>
+                <th>Customer Contact</th>
+                <th>Customer Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr scope="row">1</tr>
+              {this.state.customers.map(cust => (
+                <tr>
+                  <td>{cust.id}</td>
+                  <td>{cust.type}</td>
+                  <td>{cust.name}</td>
+                  <td>{cust.address}</td>
+                  <td>{cust.contact}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
       </div>
     );
   }
