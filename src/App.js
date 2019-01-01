@@ -7,8 +7,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: 0,
       customerTypeId: 0,
-      customerType: "",
       customerName: "",
       customerAddress: "",
       customerContact: "",
@@ -44,15 +44,54 @@ class App extends Component {
     this.setState({ [e.target.name]: e.target.value });
     console.log(e.target.value);
   }
+  handleRowsValuesInTextBox(e) {
+    this.setState({
+      id: e.id,
+      customerTypeId: e.customerTypeId,
+      customerName: e.name,
+      customerAddress: e.address,
+      customerContact: e.contact
+    });
+    console.log("Populate button clicked");
+    console.log(e);
+  }
+  handleUpdate = e => {
+    console.log("update clicked");
+    console.log(e);
+    e.preventDefault();
+    console.log("Customer Type Id:" + this.state.customerTypeId);
+    console.log("Customer Name: " + this.state.customerName);
+    console.log("Customer Address: " + this.state.customerAddress);
+    console.log("Customer Contact: " + this.state.customerContact);
+    const customer = {
+      id: this.state.id,
+      customerTypeId: this.state.customerTypeId,
+      name: this.state.customerName,
+      address: this.state.customerAddress,
+      contact: this.state.customerContact
+    };
+    axios
+      .put(`http://localhost:56996/api/Customer`, { ...customer })
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+      });
+  };
+  handleDelete(e) {
+    console.log("Delete Clicked");
+    console.log(e.id);
+  }
+
   render() {
     return (
       <div>
         <h1>Customer Form</h1>
         <form action="post">
+          <input type="hidden" name="id" value={this.state.id} />
           <label>Customer Type</label>
           <select
             name="customerTypeId"
-            value={this.state.value}
+            value={this.state.customerTypeId}
             onChange={e => this.handleChange(e)}
           >
             <option value="1">Daily</option>
@@ -65,7 +104,7 @@ class App extends Component {
             placeholder="Enter Customer Name"
             type="text"
             name="customerName"
-            value={this.state.value}
+            value={this.state.customerName}
             onChange={e => this.handleChange(e)}
           />
           <br />
@@ -74,7 +113,7 @@ class App extends Component {
             type="text"
             placeholder="Enter Customer Address"
             name="customerAddress"
-            value={this.state.value}
+            value={this.state.customerAddress}
             onChange={e => this.handleChange(e)}
           />
           <br />
@@ -83,7 +122,7 @@ class App extends Component {
             type="text"
             placeholder="Enter Customer Contact"
             name="customerContact"
-            value={this.state.value}
+            value={this.state.customerContact}
             onChange={e => this.handleChange(e)}
           />
           <br />
@@ -91,9 +130,10 @@ class App extends Component {
             Add
           </button>
           <br />
-          <button type="submit">Update</button>
+          <button type="submit" onClick={this.handleUpdate}>
+            Update
+          </button>
           <br />
-          <button type="submit">Delete</button>
         </form>
         <div>
           <Table striped>
@@ -104,17 +144,29 @@ class App extends Component {
                 <th>Customer Name</th>
                 <th>Customer Contact</th>
                 <th>Customer Address</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr scope="row">1</tr>
               {this.state.customers.map(cust => (
-                <tr>
+                <tr key={cust.id}>
                   <td>{cust.id}</td>
                   <td>{cust.type}</td>
                   <td>{cust.name}</td>
                   <td>{cust.address}</td>
                   <td>{cust.contact}</td>
+                  <td>
+                    <input
+                      type="button"
+                      value="Update"
+                      onClick={() => this.handleRowsValuesInTextBox(cust)}
+                    />
+                    <input
+                      type="button"
+                      value="Delete"
+                      onClick={() => this.handleDelete(cust)}
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>
