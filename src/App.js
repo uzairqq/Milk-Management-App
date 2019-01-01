@@ -77,10 +77,16 @@ class App extends Component {
         console.log(res.data);
       });
   };
-  handleDelete(e) {
+  handleDelete = cust => {
+    axios
+      .delete(`http://localhost:56996/api/Customer`, { data: cust })
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+      });
     console.log("Delete Clicked");
-    console.log(e.id);
-  }
+    console.log(cust);
+  };
 
   render() {
     return (
@@ -93,7 +99,9 @@ class App extends Component {
             name="customerTypeId"
             value={this.state.customerTypeId}
             onChange={e => this.handleChange(e)}
+            required
           >
+            <option value="0">--Select--</option>
             <option value="1">Daily</option>
             <option value="2">Weekly</option>
           </select>
@@ -110,6 +118,7 @@ class App extends Component {
           <br />
           <label>Customer Address:</label>
           <input
+            required
             type="text"
             placeholder="Enter Customer Address"
             name="customerAddress"
@@ -119,6 +128,7 @@ class App extends Component {
           <br />
           <label>Customer Contact:</label>
           <input
+            required
             type="text"
             placeholder="Enter Customer Contact"
             name="customerContact"
