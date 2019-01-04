@@ -12,6 +12,7 @@
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-scripts": "2.1.2",
+    "react-validation": "^3.0.7",
     "reactstrap": "^6.5.0"
   },
   "scripts": {

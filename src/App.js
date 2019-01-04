@@ -7,6 +7,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      username: "",
       id: 0,
       customerTypeId: 0,
       customerName: "",
@@ -14,15 +15,58 @@ class App extends Component {
       customerContact: "",
       customers: []
     };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
+
   componentDidMount() {
     axios.get(`http://localhost:56996/api/Customer/all`).then(res => {
       const customers = res.data;
       this.setState({ customers });
     });
   }
+  showFormErrors() {
+    const inputs = document.getElementsByName("username");
+    let isFormValid = true;
+
+    inputs.forEach(input => {
+      input.classList.add("active");
+
+      const isInputValid = this.showInputError(input);
+
+      if (!isInputValid) {
+        isFormValid = false;
+      }
+    });
+    return isFormValid;
+  }
+  showInputError(input) {
+    const name = input.name;
+    const validity = input.validity;
+    const label = document.getElementById(`${name}Label`).textContent;
+    const error = document.getElementById(`${name}Error`);
+
+    if (!validity.valid) {
+      if (validity.valueMissing) {
+        error.textContent = `${label} is a required field`;
+      }
+      return false;
+    }
+
+    error.textContent = "";
+    return true;
+  }
+
   handleSubmit = e => {
     e.preventDefault();
+
+    console.log("Component state:", JSON.stringify(this.state));
+
+    if (!this.showFormErrors()) {
+      console.log("Form is invalid: do not submit");
+    } else {
+      console.log("Form is valid: submit");
+    }
     console.log("Customer Type Id:" + this.state.customerTypeId);
     console.log("Customer Name: " + this.state.customerName);
     console.log("Customer Address: " + this.state.customerAddress);
@@ -40,9 +84,13 @@ class App extends Component {
         console.log(res.data);
       });
   };
+
   handleChange(e) {
+    e.target.classList.add("active");
+
     this.setState({ [e.target.name]: e.target.value });
     console.log(e.target.value);
+    this.showInputError(e.target);
   }
   handleRowsValuesInTextBox(e) {
     this.setState({
@@ -92,7 +140,21 @@ class App extends Component {
     return (
       <div>
         <h1>Customer Form</h1>
-        <form action="post">
+        <form action="post" noValidate>
+          <div className="form-group">
+            <label id="usernameLabel">Username</label>
+            <input
+              type="email"
+              name="username"
+              ref={username => (this.username = username)}
+              value={this.state.username}
+              onChange={this.handleChange}
+              className="form-control"
+              required
+            />
+            <div className="error" id="usernameError" />
+          </div>
+
           <input type="hidden" name="id" value={this.state.id} />
           <label>Customer Type</label>
           <select
@@ -106,7 +168,7 @@ class App extends Component {
             <option value="2">Weekly</option>
           </select>
           <br />
-          <label>Customer Name:</label>
+          <label>Customer Name</label>
           <input
             required
             placeholder="Enter Customer Name"
@@ -116,7 +178,7 @@ class App extends Component {
             onChange={e => this.handleChange(e)}
           />
           <br />
-          <label>Customer Address:</label>
+          <label>Customer Address</label>
           <input
             required
             type="text"
