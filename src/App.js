@@ -77,12 +77,14 @@ class App extends Component {
       address: this.state.customerAddress,
       contact: this.state.customerContact
     };
-    axios
-      .post(`http://localhost:56996/api/Customer`, { ...customer })
-      .then(res => {
-        console.log(res);
-        console.log(res.data);
-      });
+    if (this.showFormErrors()) {
+      axios
+        .post(`http://localhost:56996/api/Customer`, { ...customer })
+        .then(res => {
+          console.log(res);
+          console.log(res.data);
+        });
+    }
   };
 
   handleChange(e) {
@@ -140,7 +142,7 @@ class App extends Component {
     return (
       <div>
         <h1>Customer Form</h1>
-        <form action="post" noValidate>
+        <form action="post" noValidate onSubmit={this.handleSubmit}>
           <div className="form-group">
             <label id="usernameLabel">Username</label>
             <input
@@ -198,9 +200,7 @@ class App extends Component {
             onChange={e => this.handleChange(e)}
           />
           <br />
-          <button type="submit" onClick={this.handleSubmit}>
-            Add
-          </button>
+          <button type="submit">Add</button>
           <br />
           <button type="submit" onClick={this.handleUpdate}>
             Update
