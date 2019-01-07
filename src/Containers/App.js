@@ -49,6 +49,10 @@ class App extends Component {
     if (!validity.valid) {
       if (validity.valueMissing) {
         error.textContent = `${label} is a required field`;
+        input.classList.add("active");
+      }
+      if (validity.valueMissing == false) {
+        input.classList.add("valid");
       }
       return false;
     }
@@ -88,7 +92,7 @@ class App extends Component {
   };
 
   handleChange(e) {
-    e.target.classList.add("active");
+    // e.target.classList.add("active");
 
     this.setState({ [e.target.name]: e.target.value });
     console.log(e.target.value);

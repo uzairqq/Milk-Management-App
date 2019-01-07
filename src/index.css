@@ -42,6 +42,11 @@ input.active:invalid {
   box-shadow: 0 0 5px 1px red;
 }
 
+.valid {
+  box-shadow: 0 0 5px 1px green;
+}
+
+
 .error {
   color: red;
   font-size: 12px;
