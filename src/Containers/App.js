@@ -1,7 +1,16 @@
 import React, { Component } from "react";
-import "./App.css";
 import axios from "axios";
-import { Table } from "reactstrap";
+import {
+  Container,
+  Row,
+  Form,
+  FormGroup,
+  Table,
+  Input,
+  Label,
+  Button,
+  Col
+} from "reactstrap";
 
 class App extends Component {
   constructor(props) {
@@ -25,6 +34,7 @@ class App extends Component {
       this.setState({ customers });
     });
   }
+
   showFormErrors() {
     const inputs = document.getElementsByName("username");
     let isFormValid = true;
@@ -40,21 +50,26 @@ class App extends Component {
     });
     return isFormValid;
   }
+
   showInputError(input) {
     const name = input.name;
     const validity = input.validity;
-    const label = document.getElementById(`${name}Label`).textContent;
+    const label = document.querySelector(`label[for='${input.id}']`)
+      .textContent;
     const error = document.getElementById(`${name}Error`);
 
     if (!validity.valid) {
       if (validity.valueMissing) {
         error.textContent = `${label} is a required field`;
-        input.classList.add("active");
-      }
-      if (validity.valueMissing == false) {
-        input.classList.add("valid");
+        input.classList.add("is-invalid");
+        input.classList.remove("is-valid");
       }
       return false;
+    } else {
+      if (!validity.valueMissing) {
+        input.classList.remove("is-invalid");
+        input.classList.add("is-valid");
+      }
     }
 
     error.textContent = "";
@@ -144,111 +159,143 @@ class App extends Component {
 
   render() {
     return (
-      <div>
+      <Container>
         <h1>Customer Form</h1>
-        <form action="post" noValidate onSubmit={this.handleSubmit}>
-          <div className="form-group">
-            <label id="usernameLabel">Username</label>
-            <input
-              type="email"
-              name="username"
-              ref={username => (this.username = username)}
-              value={this.state.username}
-              onChange={this.handleChange}
-              className="form-control"
-              required
-            />
+        <Form action="post" noValidate onSubmit={this.handleSubmit}>
+          <FormGroup row={true}>
+            <Label for="username" sm={2}>
+              Username
+            </Label>
+            <Col sm={10}>
+              <Input
+                type="text"
+                name="username"
+                id="username"
+                value={this.state.username}
+                onChange={this.handleChange}
+                required
+              />
+            </Col>
             <div className="error" id="usernameError" />
-          </div>
+          </FormGroup>
 
-          <input type="hidden" name="id" value={this.state.id} />
-          <label>Customer Type</label>
-          <select
-            name="customerTypeId"
-            value={this.state.customerTypeId}
-            onChange={e => this.handleChange(e)}
-            required
-          >
-            <option value="0">--Select--</option>
-            <option value="1">Daily</option>
-            <option value="2">Weekly</option>
-          </select>
-          <br />
-          <label>Customer Name</label>
-          <input
-            required
-            placeholder="Enter Customer Name"
-            type="text"
-            name="customerName"
-            value={this.state.customerName}
-            onChange={e => this.handleChange(e)}
-          />
-          <br />
-          <label>Customer Address</label>
-          <input
-            required
-            type="text"
-            placeholder="Enter Customer Address"
-            name="customerAddress"
-            value={this.state.customerAddress}
-            onChange={e => this.handleChange(e)}
-          />
-          <br />
-          <label>Customer Contact:</label>
-          <input
-            required
-            type="text"
-            placeholder="Enter Customer Contact"
-            name="customerContact"
-            value={this.state.customerContact}
-            onChange={e => this.handleChange(e)}
-          />
-          <br />
-          <button type="submit">Add</button>
-          <br />
-          <button type="submit" onClick={this.handleUpdate}>
-            Update
-          </button>
-          <br />
-        </form>
-        <div>
-          <Table striped>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Customer Type</th>
-                <th>Customer Name</th>
-                <th>Customer Contact</th>
-                <th>Customer Address</th>
-                <th>Actions</th>
+          <FormGroup row={true}>
+            <Input type="hidden" name="id" value={this.state.id} />
+            <Label for="customerTypeId" sm={2}>
+              Customer Type
+            </Label>
+            <Col sm={10}>
+              <Input
+                name="customerTypeId"
+                id="customerTypeId"
+                value={this.state.customerTypeId}
+                onChange={this.handleChange}
+                required
+                type="select"
+              >
+                <option value="0">--Select--</option>
+                <option value="1">Daily</option>
+                <option value="2">Weekly</option>
+              </Input>
+            </Col>
+            <div className="error" id="customerTypeIdError" />
+          </FormGroup>
+          <FormGroup row={true}>
+            <Label for="customerName" sm={2}>
+              Customer Name
+            </Label>
+            <Col sm={10}>
+              <Input
+                required
+                placeholder="Enter Customer Name"
+                type="text"
+                name="customerName"
+                id="customerName"
+                value={this.state.customerName}
+                onChange={this.handleChange}
+              />
+            </Col>
+            <div className="error" id="customerNameError" />
+          </FormGroup>
+          <FormGroup row={true}>
+            <Label for="customerAddress" sm={2}>
+              Customer Address
+            </Label>
+            <Col sm={10}>
+              <Input
+                required
+                type="text"
+                placeholder="Enter Customer Address"
+                name="customerAddress"
+                id="customerAddress"
+                value={this.state.customerAddress}
+                onChange={this.handleChange}
+              />
+            </Col>
+            <div className="error" id="customerAddressError" />
+          </FormGroup>
+          <FormGroup row={true}>
+            <Label for="customerContact" sm={2}>
+              Customer Contact
+            </Label>
+            <Col sm={10}>
+              <Input
+                required
+                type="text"
+                placeholder="Enter Customer Contact"
+                name="customerContact"
+                id="customerContact"
+                value={this.state.customerContact}
+                onChange={this.handleChange}
+              />
+            </Col>
+            <div className="error" id="customerContactError" />
+          </FormGroup>
+          <FormGroup row={true}>
+            <Button type="submit" className="mr-3">
+              Add
+            </Button>
+            <Button type="submit" onClick={this.handleUpdate}>
+              Update
+            </Button>
+          </FormGroup>
+        </Form>
+        <Table striped={true} responsive={true}>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Customer Type</th>
+              <th>Customer Name</th>
+              <th>Customer Contact</th>
+              <th>Customer Address</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.customers.map(cust => (
+              <tr key={cust.id}>
+                <th scope="row">{cust.id}</th>
+                <td>{cust.type}</td>
+                <td>{cust.name}</td>
+                <td>{cust.address}</td>
+                <td>{cust.contact}</td>
+                <td>
+                  <Input
+                    type="button"
+                    value="Update"
+                    onClick={() => this.handleRowsValuesInTextBox(cust)}
+                  />
+                  <Input
+                    type="button"
+                    value="Delete"
+                    onClick={() => this.handleDelete(cust)}
+                  />
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {this.state.customers.map(cust => (
-                <tr key={cust.id}>
-                  <td>{cust.id}</td>
-                  <td>{cust.type}</td>
-                  <td>{cust.name}</td>
-                  <td>{cust.address}</td>
-                  <td>{cust.contact}</td>
-                  <td>
-                    <input
-                      type="button"
-                      value="Update"
-                      onClick={() => this.handleRowsValuesInTextBox(cust)}
-                    />
-                    <input
-                      type="button"
-                      value="Delete"
-                      onClick={() => this.handleDelete(cust)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </div>
-      </div>
+            ))}
+          </tbody>
+        </Table>
+      </Container>
     );
   }
 }
