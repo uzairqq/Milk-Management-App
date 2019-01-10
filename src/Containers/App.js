@@ -1,14 +1,16 @@
 import React, { Component } from "react";
 import axios from "axios";
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 import {
   Container,
-  Row,
   Form,
   FormGroup,
   Table,
   Input,
   Label,
   Button,
+  FormFeedback,
   Col
 } from "reactstrap";
 
@@ -40,7 +42,7 @@ class App extends Component {
     let isFormValid = true;
 
     inputs.forEach(input => {
-      input.classList.add("active");
+      // input.classList.add("active");
 
       const isInputValid = this.showInputError(input);
 
@@ -86,10 +88,6 @@ class App extends Component {
     } else {
       console.log("Form is valid: submit");
     }
-    console.log("Customer Type Id:" + this.state.customerTypeId);
-    console.log("Customer Name: " + this.state.customerName);
-    console.log("Customer Address: " + this.state.customerAddress);
-    console.log("Customer Contact: " + this.state.customerContact);
     const customer = {
       customerTypeId: this.state.customerTypeId,
       name: this.state.customerName,
@@ -107,8 +105,6 @@ class App extends Component {
   };
 
   handleChange(e) {
-    // e.target.classList.add("active");
-
     this.setState({ [e.target.name]: e.target.value });
     console.log(e.target.value);
     this.showInputError(e.target);
@@ -121,17 +117,9 @@ class App extends Component {
       customerAddress: e.address,
       customerContact: e.contact
     });
-    console.log("Populate button clicked");
-    console.log(e);
   }
   handleUpdate = e => {
-    console.log("update clicked");
-    console.log(e);
     e.preventDefault();
-    console.log("Customer Type Id:" + this.state.customerTypeId);
-    console.log("Customer Name: " + this.state.customerName);
-    console.log("Customer Address: " + this.state.customerAddress);
-    console.log("Customer Contact: " + this.state.customerContact);
     const customer = {
       id: this.state.id,
       customerTypeId: this.state.customerTypeId,
@@ -153,15 +141,13 @@ class App extends Component {
         console.log(res);
         console.log(res.data);
       });
-    console.log("Delete Clicked");
-    console.log(cust);
   };
 
   render() {
     return (
       <Container>
         <h1>Customer Form</h1>
-        <Form action="post" noValidate onSubmit={this.handleSubmit}>
+        <Form action="post" onSubmit={this.handleSubmit}>
           <FormGroup row={true}>
             <Label for="username" sm={2}>
               Username
@@ -175,8 +161,9 @@ class App extends Component {
                 onChange={this.handleChange}
                 required
               />
+              <div />
+              <FormFeedback className="invalid" id="usernameError" />
             </Col>
-            <div className="error" id="usernameError" />
           </FormGroup>
 
           <FormGroup row={true}>
@@ -197,8 +184,8 @@ class App extends Component {
                 <option value="1">Daily</option>
                 <option value="2">Weekly</option>
               </Input>
+              <FormFeedback className="invalid" id="customerTypeIdError" />
             </Col>
-            <div className="error" id="customerTypeIdError" />
           </FormGroup>
           <FormGroup row={true}>
             <Label for="customerName" sm={2}>
@@ -214,8 +201,8 @@ class App extends Component {
                 value={this.state.customerName}
                 onChange={this.handleChange}
               />
+              <FormFeedback className="invalid" id="customerNameError" />
             </Col>
-            <div className="error" id="customerNameError" />
           </FormGroup>
           <FormGroup row={true}>
             <Label for="customerAddress" sm={2}>
@@ -231,8 +218,8 @@ class App extends Component {
                 value={this.state.customerAddress}
                 onChange={this.handleChange}
               />
+              <FormFeedback className="invalid" id="customerAddressError" />
             </Col>
-            <div className="error" id="customerAddressError" />
           </FormGroup>
           <FormGroup row={true}>
             <Label for="customerContact" sm={2}>
@@ -248,8 +235,8 @@ class App extends Component {
                 value={this.state.customerContact}
                 onChange={this.handleChange}
               />
+              <FormFeedback className="invalid" id="customerContactError" />
             </Col>
-            <div className="error" id="customerContactError" />
           </FormGroup>
           <FormGroup row={true}>
             <Button type="submit" className="mr-3">
@@ -295,6 +282,8 @@ class App extends Component {
             ))}
           </tbody>
         </Table>
+
+        <br />
       </Container>
     );
   }

@@ -33,22 +33,3 @@ body {
   color: gray;
   margin: 8px 0;
 }
-
-input.active:valid {
-  box-shadow: 0 0 5px 1px green;
-}
-
-input.active:invalid {
-  box-shadow: 0 0 5px 1px red;
-}
-
-.valid {
-  box-shadow: 0 0 5px 1px green;
-}
-
-
-.error {
-  color: red;
-  font-size: 12px;
-  margin-top: 5px;
-}

@@ -9,9 +9,11 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-react": "^7.12.0",
+    "namor": "^1.1.1",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-scripts": "2.1.2",
+    "react-table": "^6.8.6",
     "react-validation": "^3.0.7",
     "reactstrap": "^6.5.0"
   },
