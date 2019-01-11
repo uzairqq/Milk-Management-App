@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import axios from "axios";
-import ReactTable from "react-table";
-import "react-table/react-table.css";
 import {
   Container,
   Form,
@@ -13,6 +11,7 @@ import {
   FormFeedback,
   Col
 } from "reactstrap";
+import Grid from "../Components/Grid";
 
 class App extends Component {
   constructor(props) {
@@ -282,8 +281,8 @@ class App extends Component {
             ))}
           </tbody>
         </Table>
-
         <br />
+        <Grid />
       </Container>
     );
   }
