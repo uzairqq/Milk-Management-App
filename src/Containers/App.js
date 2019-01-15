@@ -11,6 +11,7 @@ import {
   FormFeedback,
   Col
 } from "reactstrap";
+import { showFormErrors, showInputError } from "../utils/Validation";
 
 class App extends Component {
   constructor(props) {
@@ -35,72 +36,19 @@ class App extends Component {
     });
   }
 
-  showFormErrors() {
-    const inputs = document.querySelectorAll(
-      "#root > div > form > div > div > input,select"
-    );
-    for (let index = 0; index < inputs.length; index++) {
-      const input = inputs[index];
-      switch (input.type) {
-        case "hidden":
-          continue;
-      }
-      this.showInputError(input);
-    }
-  }
-
-  showInputError(input) {
-    try {
-      const name = input.name;
-      const validity = input.validity;
-      const label = document.querySelector(`label[for='${input.id}']`)
-        .textContent;
-      const error = document.getElementById(`${name}Error`);
-      switch (input.type) {
-        case "select-one":
-          if (input.value === "-1") {
-            error.textContent = `${label} is a required field`;
-            input.classList.add("is-invalid");
-            input.classList.remove("is-valid");
-          } else {
-            input.classList.remove("is-invalid");
-            input.classList.add("is-valid");
-          }
-          break;
-        case "text":
-          if (!validity.valid) {
-            if (validity.valueMissing) {
-              error.textContent = `${label} is a required field`;
-              input.classList.add("is-invalid");
-              input.classList.remove("is-valid");
-            }
-            return false;
-          } else {
-            if (!validity.valueMissing) {
-              input.classList.remove("is-invalid");
-              input.classList.add("is-valid");
-            }
-          }
-
-          error.textContent = "";
-          return true;
-      }
-    } catch (err) {
-      debugger;
-    }
-  }
   handleIsEnabled() {
     const isEnabled =
       this.state.customerTypeId === 0 &&
-      this.state.customerName.length > 0 &&
-      this.state.customerAddress.length > 0 &&
-      this.state.customerContact.length > 0;
+      this.state.customerName.length === 0 &&
+      this.state.customerAddress.length === 0 &&
+      this.state.customerContact.length === 0;
     return isEnabled;
   }
 
   handleSubmit = e => {
     e.preventDefault();
-    this.showFormErrors();
+    showFormErrors("#root > div > form > div > div > input,select");
+
     // console.log("Component state:", JSON.stringify(this.state));
     const customer = {
       customerTypeId: this.state.customerTypeId,
@@ -109,7 +57,7 @@ class App extends Component {
       contact: this.state.customerContact
     };
 
-    if (this.handleIsEnabled())
+    if (!this.handleIsEnabled())
       axios
         .post(`http://localhost:56996/api/Customer`, { ...customer })
         .then(res => {
@@ -121,7 +69,7 @@ class App extends Component {
   handleChange(e) {
     this.setState({ [e.target.name]: e.target.value });
     console.log(e.target.value);
-    this.showInputError(e.target);
+    showInputError(e.target);
   }
   handleRowsValuesInTextBox(e) {
     this.setState({
