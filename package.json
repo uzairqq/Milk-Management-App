@@ -17,9 +17,11 @@
     "react": "^16.7.0",
     "react-data-grid": "^5.0.5",
     "react-dom": "^16.7.0",
+    "react-form-validator-core": "^0.5.1",
     "react-scripts": "2.1.2",
     "react-table": "^6.8.6",
     "react-validation": "^3.0.7",
+    "reactjs-input-validator": "^0.16.3",
     "reactstrap": "^6.5.0"
   },
   "scripts": {

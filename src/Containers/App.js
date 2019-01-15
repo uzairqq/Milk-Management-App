@@ -11,7 +11,6 @@ import {
   FormFeedback,
   Col
 } from "reactstrap";
-import Grid from "../Components/Grid";
 
 class App extends Component {
   constructor(props) {
@@ -37,70 +36,86 @@ class App extends Component {
   }
 
   showFormErrors() {
-    const inputs = document.getElementsByName("username");
-    let isFormValid = true;
-
-    inputs.forEach(input => {
-      // input.classList.add("active");
-
-      const isInputValid = this.showInputError(input);
-
-      if (!isInputValid) {
-        isFormValid = false;
+    const inputs = document.querySelectorAll(
+      "#root > div > form > div > div > input,select"
+    );
+    for (let index = 0; index < inputs.length; index++) {
+      const input = inputs[index];
+      switch (input.type) {
+        case "hidden":
+          continue;
       }
-    });
-    return isFormValid;
+      this.showInputError(input);
+    }
   }
 
   showInputError(input) {
-    const name = input.name;
-    const validity = input.validity;
-    const label = document.querySelector(`label[for='${input.id}']`)
-      .textContent;
-    const error = document.getElementById(`${name}Error`);
+    try {
+      const name = input.name;
+      const validity = input.validity;
+      const label = document.querySelector(`label[for='${input.id}']`)
+        .textContent;
+      const error = document.getElementById(`${name}Error`);
+      switch (input.type) {
+        case "select-one":
+          if (input.value === "-1") {
+            error.textContent = `${label} is a required field`;
+            input.classList.add("is-invalid");
+            input.classList.remove("is-valid");
+          } else {
+            input.classList.remove("is-invalid");
+            input.classList.add("is-valid");
+          }
+          break;
+        case "text":
+          if (!validity.valid) {
+            if (validity.valueMissing) {
+              error.textContent = `${label} is a required field`;
+              input.classList.add("is-invalid");
+              input.classList.remove("is-valid");
+            }
+            return false;
+          } else {
+            if (!validity.valueMissing) {
+              input.classList.remove("is-invalid");
+              input.classList.add("is-valid");
+            }
+          }
 
-    if (!validity.valid) {
-      if (validity.valueMissing) {
-        error.textContent = `${label} is a required field`;
-        input.classList.add("is-invalid");
-        input.classList.remove("is-valid");
+          error.textContent = "";
+          return true;
       }
-      return false;
-    } else {
-      if (!validity.valueMissing) {
-        input.classList.remove("is-invalid");
-        input.classList.add("is-valid");
-      }
+    } catch (err) {
+      debugger;
     }
-
-    error.textContent = "";
-    return true;
+  }
+  handleIsEnabled() {
+    const isEnabled =
+      this.state.customerTypeId === 0 &&
+      this.state.customerName.length > 0 &&
+      this.state.customerAddress.length > 0 &&
+      this.state.customerContact.length > 0;
+    return isEnabled;
   }
 
   handleSubmit = e => {
     e.preventDefault();
-
-    console.log("Component state:", JSON.stringify(this.state));
-
-    if (!this.showFormErrors()) {
-      console.log("Form is invalid: do not submit");
-    } else {
-      console.log("Form is valid: submit");
-    }
+    this.showFormErrors();
+    // console.log("Component state:", JSON.stringify(this.state));
     const customer = {
       customerTypeId: this.state.customerTypeId,
       name: this.state.customerName,
       address: this.state.customerAddress,
       contact: this.state.customerContact
     };
-    if (this.showFormErrors()) {
+
+    if (this.handleIsEnabled())
       axios
         .post(`http://localhost:56996/api/Customer`, { ...customer })
         .then(res => {
           console.log(res);
           console.log(res.data);
         });
-    }
   };
 
   handleChange(e) {
@@ -117,6 +132,7 @@ class App extends Component {
       customerContact: e.contact
     });
   }
+
   handleUpdate = e => {
     e.preventDefault();
     const customer = {
@@ -146,25 +162,7 @@ class App extends Component {
     return (
       <Container>
         <h1>Customer Form</h1>
-        <Form action="post" onSubmit={this.handleSubmit}>
-          <FormGroup row={true}>
-            <Label for="username" sm={2}>
-              Username
-            </Label>
-            <Col sm={10}>
-              <Input
-                type="text"
-                name="username"
-                id="username"
-                value={this.state.username}
-                onChange={this.handleChange}
-                required
-              />
-              <div />
-              <FormFeedback className="invalid" id="usernameError" />
-            </Col>
-          </FormGroup>
-
+        <Form action="post" onSubmit={this.handleSubmit} noValidate={true}>
           <FormGroup row={true}>
             <Input type="hidden" name="id" value={this.state.id} />
             <Label for="customerTypeId" sm={2}>
@@ -179,7 +177,7 @@ class App extends Component {
                 required
                 type="select"
               >
-                <option value="0">--Select--</option>
+                <option value="-1">--Select--</option>
                 <option value="1">Daily</option>
                 <option value="2">Weekly</option>
               </Input>
@@ -282,7 +280,7 @@ class App extends Component {
           </tbody>
         </Table>
         <br />
-        <Grid />
+        {/* <Grid /> */}
       </Container>
     );
   }
