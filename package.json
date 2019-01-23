@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "ag-grid-community": "^19.1.4",
-    "ag-grid-enterprise": "^19.1.4",
     "ag-grid-react": "^19.1.2",
     "axios": "^0.18.0",
     "bootstrap": "^4.2.1",

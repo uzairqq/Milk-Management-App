@@ -9,6 +9,7 @@ import {
   Button,
   Form
 } from "reactstrap";
+import Grid from "../Components/Grid";
 import { showFormErrors, showInputError } from "../utils/Validation";
 import axios from "axios";
 
@@ -52,7 +53,7 @@ class Expense extends Component {
     showFormErrors("#root > div > form > div > div > input,select");
 
     const expense = {
-      expenseId: this.state.expenseId,
+      // expenseId: this.state.expenseId,
       expenseName: this.state.expenseName
     };
 
@@ -97,6 +98,7 @@ class Expense extends Component {
             </Button>
           </FormGroup>
         </Form>
+        <Grid />
       </Container>
     );
   }
