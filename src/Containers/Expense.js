@@ -18,11 +18,34 @@ class Expense extends Component {
     super(props);
     this.state = {
       expenseId: 0,
-      expenseName: "",
-      expense: []
+      expenseName: ""
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
+    this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
+  }
+
+  componentDidMount() {
+    this.loadData();
+  }
+
+  loadData() {
+    fetch("http://localhost:56996/api/Expense/all")
+      .then(result => result.json())
+      .then(expense => {
+        expense.forEach(i => {
+          i.handleDataForUpdate = this.handleDataForUpdate;
+          i.handleDelete = this.handleDelete;
+        });
+        this.setState({ expense });
+      });
+  }
+  handleDataForUpdate(val) {
+    this.setState({
+      expenseId: val.id,
+      expenseName: val.expenseName
+    });
   }
 
   handleChange(e) {
@@ -30,24 +53,41 @@ class Expense extends Component {
     console.log(e.target.value);
     showInputError(e.target);
   }
+
   handleRowsValuesInTextBox(e) {
     this.setState({
       id: e.id,
       expenseName: e.name
     });
   }
-  componentDidMount() {
-    axios.get(`http://localhost:56996/api/Expense/all`).then(res => {
-      const expense = res.data;
-      this.setState({ expense });
-    });
-  }
+  handleUpdate = val => {
+    // e.preventDefault();
+    const expense = val;
+    axios
+      .put(`http://localhost:56996/api/Expense`, { ...expense })
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+        this.loadData();
+      });
+  };
+
+  handleDelete = val => {
+    axios
+      .delete(`http://localhost:56996/api/Expense/`, { data: val })
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+        this.loadData();
+      });
+  };
 
   handleIsEnabled() {
     const isEnabled =
       this.state.expenseId === 0 && this.state.expenseName.length === 0;
     return isEnabled;
   }
+
   handleSubmit = e => {
     e.preventDefault();
     showFormErrors("#root > div > form > div > div > input,select");
@@ -63,8 +103,10 @@ class Expense extends Component {
         .then(res => {
           console.log(res);
           console.log(res.data);
+          this.loadData();
         });
   };
+
   render() {
     return (
       <Container>
@@ -96,9 +138,42 @@ class Expense extends Component {
             <Button type="submit" className="mr-3">
               Add
             </Button>
+            <Button
+              type="submit"
+              disabled
+              onClick={() => this.handleUpdate}
+              className="mr-3"
+              disabled={!this.state.expenseId}
+            >
+              Update
+            </Button>
           </FormGroup>
         </Form>
-        <Grid />
+        <Grid
+          rowData={this.state.expense}
+          columnDef={[
+            {
+              headerName: "Id",
+              field: "id",
+              checkboxSelection: true,
+              editable: true
+            },
+            {
+              headerName: "Expense Name",
+              field: "expenseName",
+              checkboxSelection: true,
+              editable: true
+            },
+            {
+              headerName: "Actions",
+              field: "value",
+              cellRenderer: "childMessageRenderer",
+              colId: "params",
+              width: 180,
+              editable: false
+            }
+          ]}
+        />
       </Container>
     );
   }

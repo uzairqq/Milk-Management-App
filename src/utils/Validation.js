@@ -6,6 +6,8 @@ export function showFormErrors(querySelector) {
     switch (input.type) {
       case "hidden":
         continue;
+      default:
+        break;
     }
     showInputError(input);
   }
@@ -46,6 +48,8 @@ export function showInputError(input) {
 
         error.textContent = "";
         return true;
+      default:
+        break;
     }
   } catch (err) {
     debugger;

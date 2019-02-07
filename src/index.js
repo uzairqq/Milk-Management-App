@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Expense from ".//Containers/Expense";
+import Expense from "./Containers/Expense";
 
 ReactDOM.render(<Expense />, document.getElementById("root"));
 

@@ -12,7 +12,6 @@ import {
   Col
 } from "reactstrap";
 import { showFormErrors, showInputError } from "../utils/Validation";
-import { Confirm } from "react-confirm-bootstrap";
 
 class App extends Component {
   constructor(props) {
