@@ -60,9 +60,12 @@ class Expense extends Component {
       expenseName: e.name
     });
   }
-  handleUpdate = val => {
-    // e.preventDefault();
-    const expense = val;
+  handleUpdate = e => {
+    e.preventDefault();
+    const expense = {
+      id: this.state.expenseId,
+      expenseName: this.state.expenseName
+    };
     axios
       .put(`http://localhost:56996/api/Expense`, { ...expense })
       .then(res => {
@@ -135,13 +138,12 @@ class Expense extends Component {
             </Col>
           </FormGroup>
           <FormGroup row={true}>
-            <Button type="submit" className="mr-3">
+            <Button type="submit" onClick={this.handleSubmit} className="mr-3">
               Add
             </Button>
             <Button
               type="submit"
-              disabled
-              onClick={() => this.handleUpdate}
+              onClick={this.handleUpdate}
               className="mr-3"
               disabled={!this.state.expenseId}
             >
