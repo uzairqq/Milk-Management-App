@@ -12,6 +12,7 @@ import {
 import Grid from "../Components/Grid";
 import { showFormErrors, showInputError } from "../utils/Validation";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 class Expense extends Component {
   constructor(props) {
@@ -22,7 +23,6 @@ class Expense extends Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleUpdate = this.handleUpdate.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
   }
 
@@ -47,10 +47,15 @@ class Expense extends Component {
       expenseName: val.expenseName
     });
   }
+  initialState() {
+    this.setState({
+      expenseId: 0,
+      expenseName: ""
+    });
+  }
 
   handleChange(e) {
     this.setState({ [e.target.name]: e.target.value });
-    console.log(e.target.value);
     showInputError(e.target);
   }
 
@@ -60,29 +65,55 @@ class Expense extends Component {
       expenseName: e.name
     });
   }
-  handleUpdate = e => {
-    e.preventDefault();
-    const expense = {
-      id: this.state.expenseId,
-      expenseName: this.state.expenseName
-    };
-    axios
-      .put(`http://localhost:56996/api/Expense`, { ...expense })
-      .then(res => {
-        console.log(res);
-        console.log(res.data);
-        this.loadData();
-      });
-  };
+  handleUpdate() {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Update it!"
+    }).then(result => {
+      if (result.value) {
+        const expense = {
+          id: this.state.expenseId,
+          expenseName: this.state.expenseName
+        };
+        axios
+          .put(`http://localhost:56996/api/Expense`, { ...expense })
+          .then(res => {
+            console.log(res);
+            console.log(res.data);
+            this.loadData();
+            this.initialState();
+            Swal.fire("Updated!", "Your Record has been Updated.", "success");
+          });
+      }
+    });
+  }
 
   handleDelete = val => {
-    axios
-      .delete(`http://localhost:56996/api/Expense/`, { data: val })
-      .then(res => {
-        console.log(res);
-        console.log(res.data);
-        this.loadData();
-      });
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(result => {
+      if (result.value) {
+        axios
+          .delete(`http://localhost:56996/api/Expense/`, { data: val })
+          .then(res => {
+            console.log(res);
+            console.log(res.data);
+            this.loadData();
+            Swal.fire("Deleted!", "Your file has been deleted.", "success");
+          });
+      }
+    });
   };
 
   handleIsEnabled() {
@@ -91,12 +122,11 @@ class Expense extends Component {
     return isEnabled;
   }
 
-  handleSubmit = e => {
-    e.preventDefault();
+  handleSubmit() {
+    // e.preventDefault();
     showFormErrors("#root > div > form > div > div > input,select");
 
     const expense = {
-      // expenseId: this.state.expenseId,
       expenseName: this.state.expenseName
     };
 
@@ -107,14 +137,15 @@ class Expense extends Component {
           console.log(res);
           console.log(res.data);
           this.loadData();
+          this.initialState();
         });
-  };
+  }
 
   render() {
     return (
       <Container>
         <h1>Expense Form</h1>
-        <Form action="post" onSubmit={this.handleSubmit} noValidate={true}>
+        <Form action="post" noValidate={true}>
           <FormGroup row={true}>
             <Input
               type="hidden"
@@ -138,12 +169,16 @@ class Expense extends Component {
             </Col>
           </FormGroup>
           <FormGroup row={true}>
-            <Button type="submit" onClick={this.handleSubmit} className="mr-3">
+            <Button
+              type="button"
+              disabled={this.state.expenseId ? true : false}
+              // onClick={this.handleSubmit.bind(this)}
+              className="mr-3"
+            >
               Add
             </Button>
             <Button
-              type="submit"
-              onClick={this.handleUpdate}
+              onClick={this.handleUpdate.bind(this)}
               className="mr-3"
               disabled={!this.state.expenseId}
             >
