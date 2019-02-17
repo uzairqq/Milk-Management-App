@@ -87,7 +87,17 @@ class Expense extends Component {
             console.log(res.data);
             this.loadData();
             this.initialState();
-            Swal.fire("Updated!", "Your Record has been Updated.", "success");
+            if (res.data.success) {
+              Swal.fire("Updated!", "Your Record has been Updated.", "success");
+            } else {
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: res.data.failureMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            }
           });
       }
     });
@@ -110,7 +120,7 @@ class Expense extends Component {
             console.log(res);
             console.log(res.data);
             this.loadData();
-            Swal.fire("Deleted!", "Your file has been deleted.", "success");
+            Swal.fire("Deleted!", "Your Record Has Been Deleted.", "success");
           });
       }
     });
@@ -123,7 +133,6 @@ class Expense extends Component {
   }
 
   handleSubmit() {
-    // e.preventDefault();
     showFormErrors("#root > div > form > div > div > input,select");
 
     const expense = {
@@ -138,6 +147,23 @@ class Expense extends Component {
           console.log(res.data);
           this.loadData();
           this.initialState();
+          if (res.data.success) {
+            Swal.fire({
+              position: "top-end",
+              type: "success",
+              title: res.data.successMessage,
+              showConfirmButton: false,
+              timer: 1500
+            });
+          } else {
+            Swal.fire({
+              position: "top-end",
+              type: "error",
+              title: res.data.failureMessage,
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
         });
   }
 
@@ -172,7 +198,7 @@ class Expense extends Component {
             <Button
               type="button"
               disabled={this.state.expenseId ? true : false}
-              // onClick={this.handleSubmit.bind(this)}
+              onClick={this.handleSubmit.bind(this)}
               className="mr-3"
             >
               Add

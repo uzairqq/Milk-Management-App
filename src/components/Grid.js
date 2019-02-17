@@ -15,35 +15,16 @@ class Grid extends Component {
       }
     };
   }
-  methodFromParent(cell) {
-    alert("Parent Component Method from " + cell + "!");
-  }
-  onButtonClick = e => {
-    const selectedNodes = this.gridApi.getSelectedNodes();
-    const selectedData = selectedNodes.map(node => node.data);
-    const selectedDataStringPresentation = selectedData
-      .map(node => node.make + " " + node.model + " " + node.price)
-      .join(", ");
-    alert(`Selected nodes: ${selectedDataStringPresentation}`);
-  };
   onRemoveSelected() {
     const selectedData = this.gridApi.getSelectedRows();
     console.log(selectedData);
-    // const res = this.gridApi.updateRowData({ remove: selectedData });
   }
-  // GetName(val) {
-  //   console.log(val);
-  // }
   render() {
     return (
       <div
         style={{ height: "200px", width: "1150px" }}
         className="ag-theme-blue"
       >
-        {/* <button onClick={this.onButtonClick}>Get selected rows</button> */}
-        <button onClick={this.onRemoveSelected.bind(this)}>
-          Remove Selected
-        </button>
         <AgGridReact
           columnDefs={this.props.columnDef}
           rowData={this.props.rowData}
