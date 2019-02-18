@@ -89,14 +89,6 @@ class Expense extends Component {
             this.initialState();
             if (res.data.success) {
               Swal.fire("Updated!", "Your Record has been Updated.", "success");
-            } else {
-              Swal.fire({
-                position: "top-end",
-                type: "error",
-                title: res.data.failureMessage,
-                showConfirmButton: false,
-                timer: 2000
-              });
             }
           });
       }
@@ -133,6 +125,7 @@ class Expense extends Component {
   }
 
   handleSubmit() {
+    // e.preventDefault();
     showFormErrors("#root > div > form > div > div > input,select");
 
     const expense = {
