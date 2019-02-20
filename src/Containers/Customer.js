@@ -19,7 +19,7 @@ class Customer extends Component {
     super(props);
     this.state = {
       id: 0,
-      customerTypeId: 0,
+      customerTypeId: -1,
       customerName: "",
       customerAddress: "",
       customerContact: ""
@@ -27,6 +27,7 @@ class Customer extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
   }
 
   componentDidMount() {
@@ -77,12 +78,12 @@ class Customer extends Component {
   };
 
   handleIsEnabled() {
-    const isEnabled =
-      this.state.customerTypeId === 0 &&
-      this.state.customerName.length === 0 &&
-      this.state.customerAddress.length === 0 &&
-      this.state.customerContact.length === 0;
-    return isEnabled;
+    const haveValues =
+      this.state.customerTypeId !== 0 &&
+      this.state.customerName !== "" &&
+      this.state.customerAddress !== "" &&
+      this.state.customerContact !== "";
+    return haveValues;
   }
 
   handleSubmit = e => {
@@ -97,7 +98,7 @@ class Customer extends Component {
       contact: this.state.customerContact
     };
 
-    if (!this.handleIsEnabled())
+    if (this.handleIsEnabled() === true)
       axios
         .post(`http://localhost:56996/api/Customer`, { ...customer })
         .then(res => {
@@ -105,6 +106,7 @@ class Customer extends Component {
           this.initialState();
           console.log(res);
           console.log(res.data);
+
           if (res.data.success) {
             Swal.fire({
               position: "top-end",
@@ -141,47 +143,102 @@ class Customer extends Component {
   initialState() {
     this.setState({
       id: 0,
-      customerTypeId: "",
+      customerTypeId: -1,
       customerName: "",
       customerContact: "",
       customerAddress: ""
     });
   }
-
-  handleUpdate = e => {
-    e.preventDefault();
-    const customer = {
-      id: this.state.id,
-      customerTypeId: this.state.customerTypeId,
-      name: this.state.customerName,
-      address: this.state.customerAddress,
-      contact: this.state.customerContact
-    };
-    axios
-      .put(`http://localhost:56996/api/Customer`, { ...customer })
-      .then(res => {
-        this.loadData();
-        this.initialState();
-        console.log(res);
-        console.log(res.data);
-      });
-  };
+  handleUpdate() {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Update it!"
+    }).then(result => {
+      if (result.value) {
+        const customer = {
+          id: this.state.id,
+          customerTypeId: this.state.customerTypeId,
+          name: this.state.customerName,
+          address: this.state.customerAddress,
+          contact: this.state.customerContact
+        };
+        axios
+          .put(`http://localhost:56996/api/Customer`, { ...customer })
+          .then(res => {
+            console.log(res);
+            console.log(res.data);
+            this.loadData();
+            this.initialState();
+            if (res.data.success) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: res.data.successMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            } else {
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: res.data.failureMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            }
+          });
+      }
+    });
+  }
   handleDelete = cust => {
-    axios
-      .delete(`http://localhost:56996/api/Customer`, { data: cust })
-      .then(res => {
-        this.loadData();
-        this.initialState();
-        console.log(res);
-        console.log(res.data);
-      });
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(result => {
+      if (result.value) {
+        axios
+          .delete(`http://localhost:56996/api/Customer`, { data: cust })
+          .then(res => {
+            console.log(res);
+            console.log(res.data);
+            this.loadData();
+            if (res.data.success) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: res.data.successMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            } else {
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: res.data.failureMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            }
+          });
+      }
+    });
   };
 
   render() {
     return (
       <Container>
         <h1>Customer Form</h1>
-        <Form action="post" onSubmit={this.handleSubmit} noValidate={true}>
+        <Form action="post" noValidate={true}>
           <FormGroup row={true}>
             <Input type="hidden" name="id" value={this.state.id} />
             <Label for="customerTypeId" sm={2}>
@@ -256,17 +313,13 @@ class Customer extends Component {
           </FormGroup>
           <FormGroup row={true}>
             <Button
-              type="submit"
               disabled={this.state.id ? true : false}
               className="mr-3"
+              onClick={this.handleSubmit}
             >
               Add
             </Button>
-            <Button
-              type="submit"
-              disabled={!this.state.id}
-              onClick={this.handleUpdate}
-            >
+            <Button disabled={!this.state.id} onClick={this.handleUpdate}>
               Update
             </Button>
           </FormGroup>

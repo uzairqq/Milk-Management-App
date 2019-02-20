@@ -88,7 +88,21 @@ class Expense extends Component {
             this.loadData();
             this.initialState();
             if (res.data.success) {
-              Swal.fire("Updated!", "Your Record has been Updated.", "success");
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: res.data.successMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            } else {
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: res.data.failureMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
             }
           });
       }
@@ -112,7 +126,23 @@ class Expense extends Component {
             console.log(res);
             console.log(res.data);
             this.loadData();
-            Swal.fire("Deleted!", "Your Record Has Been Deleted.", "success");
+            if (res.data.success) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: res.data.successMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            } else {
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: res.data.failureMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            }
           });
       }
     });
