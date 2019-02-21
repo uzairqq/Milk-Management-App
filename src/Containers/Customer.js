@@ -13,6 +13,7 @@ import {
 import Grid from "../Components/Grid";
 import Swal from "sweetalert2";
 import { showFormErrors, showInputError } from "../utils/Validation";
+import ThreeInputComponent from "../Components/ThreeInputComponent";
 
 class Customer extends Component {
   constructor(props) {
@@ -403,6 +404,7 @@ class Customer extends Component {
             }
           ]}
         />
+        <ThreeInputComponent />
       </Container>
     );
   }
