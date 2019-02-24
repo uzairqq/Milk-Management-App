@@ -1,15 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import {
-  Container,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  Button,
-  FormFeedback,
-  Col
-} from "reactstrap";
+import { Container } from "reactstrap";
 import Grid from "../Components/Grid";
 import Swal from "sweetalert2";
 import { showFormErrors, showInputError } from "../utils/Validation";
@@ -18,12 +9,207 @@ import ThreeInputComponent from "../Components/ThreeInputComponent";
 class Supplier extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      newUser: {
+        name: "",
+        contact: "",
+        address: ""
+      }
+    };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleInput = this.handleInput.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
+    this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  componentDidMount() {
+    this.loadData();
+  }
+  handleChange(e) {
+    this.setState({ [e.target.name]: e.target.value });
+  }
+  handleDataForUpdate(val) {
+    this.setState({
+      newUser: {
+        name: val.supplierName,
+        contact: val.supplierContact,
+        address: val.supplierAddress
+      }
+    });
+  }
+  handleIsEnabled() {
+    const haveValues =
+      this.state.name !== "" &&
+      this.state.address !== "" &&
+      this.state.contact !== "";
+    return haveValues;
+  }
+
+  loadData() {
+    fetch("http://localhost:56996/api/Supplier/all")
+      .then(result => result.json())
+      .then(suppliers => {
+        suppliers.forEach(i => {
+          i.handleDataForUpdate = this.handleDataForUpdate;
+          i.handleDelete = this.handleDelete;
+        });
+        this.setState({ suppliers });
+        console.log(suppliers);
+      });
+  }
+  initialState() {
+    this.setState({
+      name: "",
+      contact: "",
+      address: ""
+    });
+  }
+  handleSubmit = e => {
+    e.preventDefault();
+    showFormErrors("#root > div > form > div > div > input,select");
+
+    // console.log("Component state:", JSON.stringify(this.state));
+    const customer = {
+      name: this.state.name,
+      address: this.state.contact,
+      contact: this.state.address
+    };
+
+    if (this.handleIsEnabled() === true)
+      axios
+        .post(`http://localhost:56996/api/Supplier`, { ...customer })
+        .then(res => {
+          this.loadData();
+          this.initialState();
+          console.log(res);
+          console.log(res.data);
+
+          if (res.data.success) {
+            Swal.fire({
+              position: "top-end",
+              type: "success",
+              title: res.data.successMessage,
+              showConfirmButton: false,
+              timer: 1500
+            });
+          } else {
+            Swal.fire({
+              position: "top-end",
+              type: "error",
+              title: res.data.failureMessage,
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        });
+  };
+  handleUpdate(e) {
+    e.preventDefault();
+    console.log("update clicked");
+  }
+  handleClearForm(e) {
+    e.preventDefault();
+    this.setState({
+      newUser: {
+        name: "",
+        contact: "",
+        address: ""
+      }
+    });
+  }
+
+  handleClearForm(e) {
+    e.preventDefault();
+    console.log("clear form clicked");
+  }
+  handleInput(e) {
+    let value = e.target.value;
+    let name = e.target.name;
+    this.setState(
+      prevState => {
+        return {
+          newUser: {
+            ...prevState.newUser,
+            [name]: value
+          }
+        };
+      },
+      () => console.log(this.state.newUser)
+    );
   }
   render() {
     return (
       <Container>
-        <ThreeInputComponent name={this.props.CustomerName} />
+        <h1>Add New Supplier</h1>
+        <ThreeInputComponent
+          titlename={"Supplier Name"}
+          placeholdername={"Enter Supplier Name"}
+          inputtype={"text"}
+          name={"name"}
+          valuename={this.state.newUser.name}
+          handlechangename={this.handleInput}
+          //
+          titlecontact={"Supplier Contact"}
+          contact={"contact"}
+          valuecontact={this.state.newUser.contact}
+          placeholdercontact={"Enter your Supplier Contact"}
+          handlechangecontact={this.handleInput}
+          //
+          titleaddress={"Supplier Address"}
+          address={"address"}
+          valueaddress={this.state.newUser.address}
+          placeholderaddress={"Enter your Address"}
+          handlechangeaddress={this.handleInput}
+          //
+          buttonsavetitle={"Save"}
+          buttonsaveaction={this.handleSubmit}
+          buttonsaveclass={"btn btn-success"}
+          //
+          buttonupdatetitle={"Update"}
+          buttonupdateaction={this.handleUpdate}
+          buttonupdateclass={"btn btn-primary"}
+          //
+          buttoncleartitle={"Clear"}
+          buttonclearaction={this.handleClearForm}
+          buttonclearclass={"btn btn-danger"}
+        />
+        <Grid
+          rowData={this.state.suppliers}
+          columnDef={[
+            {
+              headerName: "Id",
+              field: "id",
+              checkboxSelection: true,
+              editable: true
+            },
+            {
+              headerName: "Supplier Name",
+              field: "supplierName",
+              checkboxSelection: true,
+              editable: true
+            },
+            {
+              headerName: "Supplier Address",
+              field: "supplierAddress",
+              checkboxSelection: true,
+              editable: true
+            },
+            {
+              headerName: "Supplier Contact",
+              field: "supplierContact",
+              checkboxSelection: true,
+              editable: true
+            },
+            {
+              headerName: "Actions",
+              field: "value",
+              cellRenderer: "childMessageRenderer",
+              colId: "params",
+              width: 180,
+              editable: false
+            }
+          ]}
+        />
       </Container>
     );
   }

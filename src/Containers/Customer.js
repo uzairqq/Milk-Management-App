@@ -13,7 +13,6 @@ import {
 import Grid from "../Components/Grid";
 import Swal from "sweetalert2";
 import { showFormErrors, showInputError } from "../utils/Validation";
-import ThreeInputComponent from "../Components/ThreeInputComponent";
 
 class Customer extends Component {
   constructor(props) {
@@ -89,9 +88,11 @@ class Customer extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    showFormErrors("#root > div > form > div > div > input,select");
-
+    showFormErrors(
+      "#root > div > div.card > div > form > div:nth-child(1) > div"
+    );
     // console.log("Component state:", JSON.stringify(this.state));
+
     const customer = {
       customerTypeId: this.state.customerTypeId,
       name: this.state.customerName,
@@ -404,7 +405,6 @@ class Customer extends Component {
             }
           ]}
         />
-        <ThreeInputComponent />
       </Container>
     );
   }

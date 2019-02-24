@@ -1,18 +1,76 @@
 import React from "react";
-import { Container, Form, FormGroup, Label, Input } from "reactstrap";
+import {
+  Container,
+  Form,
+  FormGroup,
+  Label,
+  Col,
+  Card,
+  CardBody
+} from "reactstrap";
+import InputFeilds from "./InputFeilds";
+import ButtonComponent from "./Button";
 
 const ThreeInputComponent = props => {
   return (
-    <Container>
-      <Form method="post" noValidate={true}>
-        <FormGroup row={true}>
-          <Label sm={2} for={props.name}>
-            {props.children}
-          </Label>
-          <Input type="text" name={props.name} id={props.name} required />
-        </FormGroup>
-      </Form>
-    </Container>
+    <Card>
+      <CardBody sm={5}>
+        <Form noValidate={true}>
+          <FormGroup row>
+            <Col sm={6}>
+              <InputFeilds
+                title={props.titlename}
+                placeholder={props.placeholdername}
+                inputtype={props.inputtype}
+                name={props.name}
+                value={props.valuename}
+                handlechange={props.handlechangename}
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Col sm={6}>
+              <InputFeilds
+                inputtype={props.inputtype}
+                title={props.titlecontact}
+                name={props.contact}
+                placeholder={props.placeholdercontact}
+                value={props.valuecontact}
+                handlechange={props.handlechangecontact}
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Col sm={6}>
+              <InputFeilds
+                inputtype={props.inputtype}
+                title={props.titleaddress}
+                name={props.address}
+                value={props.valueaddress}
+                placeholder={props.placeholderaddress}
+                handlechange={props.handlechangeaddress}
+              />
+            </Col>
+          </FormGroup>
+
+          <ButtonComponent
+            action={props.buttonsaveaction}
+            title={props.buttonsavetitle}
+            class={props.buttonsaveclass}
+          />
+          <ButtonComponent
+            action={props.buttonupdateaction}
+            title={props.buttonupdatetitle}
+            class={props.buttonupdateclass}
+          />
+          <ButtonComponent
+            action={props.buttonclearaction}
+            title={props.buttoncleartitle}
+            class={props.buttonclearclass}
+          />
+        </Form>
+      </CardBody>
+    </Card>
   );
 };
 
