@@ -22,7 +22,7 @@ class Grid extends Component {
   render() {
     return (
       <div
-        style={{ height: "300px", width: "1150px" }}
+        style={{ height: "300px", width: "1110px" }}
         className="ag-theme-blue"
       >
         <AgGridReact

@@ -11,6 +11,7 @@ import {
 } from "reactstrap";
 import InputFeilds from "./InputFeilds";
 import ButtonComponent from "./Button";
+import CardComponent from "./CardComponent";
 
 const ThreeInputComponent = props => {
   return (
@@ -18,7 +19,7 @@ const ThreeInputComponent = props => {
       <CardBody sm={5}>
         <Form noValidate={true}>
           <FormGroup row>
-            <Col sm={{ size: 6, order: 5, offset: 3 }}>
+            <Col sm={{ size: 6, order: 5, offset: 0 }}>
               <InputFeilds
                 title={props.titlename}
                 placeholder={props.placeholdername}
@@ -30,7 +31,7 @@ const ThreeInputComponent = props => {
             </Col>
           </FormGroup>
           <FormGroup row>
-            <Col sm={{ size: 6, order: 5, offset: 3 }}>
+            <Col sm={{ size: 6, order: 5, offset: 0 }}>
               <InputFeilds
                 inputtype={props.inputtype}
                 title={props.titlecontact}
@@ -42,7 +43,7 @@ const ThreeInputComponent = props => {
             </Col>
           </FormGroup>
           <FormGroup row>
-            <Col sm={{ size: 6, order: 5, offset: 3 }}>
+            <Col sm={{ size: 6, order: 5, offset: 0 }}>
               <InputFeilds
                 inputtype={props.inputtype}
                 title={props.titleaddress}
@@ -54,7 +55,7 @@ const ThreeInputComponent = props => {
             </Col>
           </FormGroup>
           <FormGroup row>
-            <Col sm={{ size: 6, order: 5, offset: 3 }}>
+            <Col sm={{ size: 6, order: 5, offset: 0 }}>
               <ButtonComponent
                 action={props.buttonsaveaction}
                 title={props.buttonsavetitle}
