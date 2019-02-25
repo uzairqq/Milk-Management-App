@@ -6,7 +6,6 @@ const InputFeilds = props => {
     <FormGroup>
       <Label htmlFor={props.name}>{props.title}</Label>
       <Input
-        className="form-input"
         name={props.name}
         type={props.type}
         placeholder={props.placeholder}

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Container } from "reactstrap";
+import { Container, Button } from "reactstrap";
 import Grid from "../Components/Grid";
 import Swal from "sweetalert2";
 import { showFormErrors, showInputError } from "../utils/Validation";
@@ -15,13 +15,16 @@ class Supplier extends Component {
         name: "",
         contact: "",
         address: ""
-      }
+      },
+      gridVisible: true
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleInput = this.handleInput.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClearForm = this.handleClearForm.bind(this);
+    this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
   }
   componentDidMount() {
     this.loadData();
@@ -61,7 +64,6 @@ class Supplier extends Component {
           i.handleDelete = this.handleDelete;
         });
         this.setState({ suppliers });
-        console.log(suppliers);
       });
   }
 
@@ -95,8 +97,6 @@ class Supplier extends Component {
         axios
           .put(`http://localhost:56996/api/Supplier`, { ...supplier })
           .then(res => {
-            console.log(res);
-            console.log(res.data);
             this.loadData();
             this.initialState();
             if (res.data.success) {
@@ -134,8 +134,6 @@ class Supplier extends Component {
         .then(res => {
           this.loadData();
           this.initialState();
-          console.log(res);
-          console.log(res.data);
 
           if (res.data.success) {
             Swal.fire({
@@ -159,18 +157,47 @@ class Supplier extends Component {
 
   handleClearForm(e) {
     e.preventDefault();
-    this.setState({
-      newUser: {
-        name: "",
-        contact: "",
-        address: ""
+    this.initialState();
+  }
+  handleDelete = supplier => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(result => {
+      if (result.value) {
+        axios
+          .delete(`http://localhost:56996/api/Supplier/`, { data: supplier })
+          .then(res => {
+            this.loadData();
+            if (res.data.success) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: res.data.successMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            } else {
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: res.data.failureMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            }
+          });
       }
     });
-  }
-
-  handleClearForm(e) {
+  };
+  hideOrShowGrid(e) {
     e.preventDefault();
-    console.log("clear form clicked");
+    this.setState({ gridVisible: !this.state.gridVisible });
   }
   handleInput(e) {
     let value = e.target.value;
@@ -184,8 +211,8 @@ class Supplier extends Component {
             [name]: value
           }
         };
-      },
-      () => console.log(this.state.newUser)
+      }
+      // () => console.log(this.state.newUser)
     );
     this.setState({ [e.target.name]: e.target.value });
     showInputError(e.target);
@@ -218,53 +245,62 @@ class Supplier extends Component {
           buttonsaveaction={this.handleSubmit}
           buttonsaveclass={"btn btn-success"}
           buttonsavedisabled={this.state.newUser.id ? true : false}
+          buttonsavesize={"lg"}
           //
           buttonupdatetitle={"Update"}
           buttonupdateaction={this.handleUpdate}
           buttonupdateclass={"btn btn-primary"}
           buttonupdatedisable={!this.state.newUser.id}
+          buttonupdatesize={"lg"}
           //
           buttoncleartitle={"Clear"}
           buttonclearaction={this.handleClearForm}
           buttonclearclass={"btn btn-danger"}
+          buttonclearsize={"lg"}
+          //
+          buttonshowgridtitle={
+            !this.state.gridVisible ? "Show Grid" : "Hide Grid"
+          }
+          buttonshowgridaction={this.hideOrShowGrid}
+          buttonshowgridsize={"lg"}
+          buttonshowgridclass={"btn btn-info"}
         />
-        <Grid
-          rowData={this.state.suppliers}
-          columnDef={[
-            {
-              headerName: "Id",
-              field: "id",
-              checkboxSelection: true,
-              editable: true
-            },
-            {
-              headerName: "Supplier Name",
-              field: "supplierName",
-              checkboxSelection: true,
-              editable: true
-            },
-            {
-              headerName: "Supplier Address",
-              field: "supplierAddress",
-              checkboxSelection: true,
-              editable: true
-            },
-            {
-              headerName: "Supplier Contact",
-              field: "supplierContact",
-              checkboxSelection: true,
-              editable: true
-            },
-            {
-              headerName: "Actions",
-              field: "value",
-              cellRenderer: "childMessageRenderer",
-              colId: "params",
-              width: 180,
-              editable: false
-            }
-          ]}
-        />
+        {this.state.gridVisible ? (
+          <Grid
+            rowData={this.state.suppliers}
+            columnDef={[
+              {
+                headerName: "Supplier Name",
+                field: "supplierName",
+                checkboxSelection: true,
+                editable: true,
+                width: 200
+              },
+              {
+                headerName: "Supplier Address",
+                field: "supplierAddress",
+                checkboxSelection: true,
+                editable: true,
+                width: 200
+              },
+              {
+                headerName: "Supplier Contact",
+                field: "supplierContact",
+                checkboxSelection: true,
+                editable: true,
+                width: 200
+              },
+              {
+                headerName: "Actions",
+                field: "value",
+                cellRenderer: "childMessageRenderer",
+                colId: "params",
+                width: 180,
+                editable: false
+              }
+            ]}
+          />
+        ) : null}
       </Container>
     );
   }

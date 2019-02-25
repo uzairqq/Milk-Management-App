@@ -6,18 +6,19 @@ import {
   Label,
   Col,
   Card,
-  CardBody
+  CardBody,
+  Button
 } from "reactstrap";
 import InputFeilds from "./InputFeilds";
 import ButtonComponent from "./Button";
 
 const ThreeInputComponent = props => {
   return (
-    <Card>
+    <Card body outline color="warning">
       <CardBody sm={5}>
         <Form noValidate={true}>
           <FormGroup row>
-            <Col sm={6}>
+            <Col sm={{ size: 6, order: 5, offset: 3 }}>
               <InputFeilds
                 title={props.titlename}
                 placeholder={props.placeholdername}
@@ -29,7 +30,7 @@ const ThreeInputComponent = props => {
             </Col>
           </FormGroup>
           <FormGroup row>
-            <Col sm={6}>
+            <Col sm={{ size: 6, order: 5, offset: 3 }}>
               <InputFeilds
                 inputtype={props.inputtype}
                 title={props.titlecontact}
@@ -41,7 +42,7 @@ const ThreeInputComponent = props => {
             </Col>
           </FormGroup>
           <FormGroup row>
-            <Col sm={6}>
+            <Col sm={{ size: 6, order: 5, offset: 3 }}>
               <InputFeilds
                 inputtype={props.inputtype}
                 title={props.titleaddress}
@@ -52,24 +53,36 @@ const ThreeInputComponent = props => {
               />
             </Col>
           </FormGroup>
-
-          <ButtonComponent
-            action={props.buttonsaveaction}
-            title={props.buttonsavetitle}
-            class={props.buttonsaveclass}
-            disable={props.buttonsavedisabled}
-          />
-          <ButtonComponent
-            action={props.buttonupdateaction}
-            title={props.buttonupdatetitle}
-            class={props.buttonupdateclass}
-            disable={props.buttonupdatedisable}
-          />
-          <ButtonComponent
-            action={props.buttonclearaction}
-            title={props.buttoncleartitle}
-            class={props.buttonclearclass}
-          />
+          <FormGroup row>
+            <Col sm={{ size: 6, order: 5, offset: 3 }}>
+              <ButtonComponent
+                action={props.buttonsaveaction}
+                title={props.buttonsavetitle}
+                class={props.buttonsaveclass}
+                disable={props.buttonsavedisabled}
+                size={props.buttonsavesize}
+              />{" "}
+              <ButtonComponent
+                action={props.buttonupdateaction}
+                title={props.buttonupdatetitle}
+                class={props.buttonupdateclass}
+                disable={props.buttonupdatedisable}
+                size={props.buttonupdatesize}
+              />{" "}
+              <ButtonComponent
+                action={props.buttonclearaction}
+                title={props.buttoncleartitle}
+                class={props.buttonclearclass}
+                size={props.buttonclearsize}
+              />{" "}
+              <ButtonComponent
+                action={props.buttonshowgridaction}
+                title={props.buttonshowgridtitle}
+                class={props.buttonshowgridclass}
+                size={props.buttonshowgridsize}
+              />
+            </Col>
+          </FormGroup>
         </Form>
       </CardBody>
     </Card>

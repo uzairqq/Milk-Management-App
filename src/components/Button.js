@@ -8,8 +8,8 @@ const ButtonComponent = props => {
       type="submit"
       className={props.class}
       onClick={props.action}
-      className={props.class}
       disabled={props.disable}
+      size={props.size}
     >
       {props.title}
     </Button>

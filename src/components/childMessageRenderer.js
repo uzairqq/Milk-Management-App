@@ -28,7 +28,8 @@ export default class ChildMessageRenderer extends Component {
           className="btn btn-info"
         >
           Edit
-        </button>
+        </button>{" "}
+        ||{" "}
         <button
           style={{ height: 20, lineHeight: 0.5 }}
           onClick={this.handleDelete}
