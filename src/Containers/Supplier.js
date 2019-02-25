@@ -11,6 +11,7 @@ class Supplier extends Component {
     super(props);
     this.state = {
       newUser: {
+        id: 0,
         name: "",
         contact: "",
         address: ""
@@ -32,6 +33,7 @@ class Supplier extends Component {
   handleDataForUpdate(val) {
     this.setState({
       newUser: {
+        id: val.id,
         name: val.supplierName,
         contact: val.supplierContact,
         address: val.supplierAddress
@@ -62,26 +64,70 @@ class Supplier extends Component {
         console.log(suppliers);
       });
   }
+
   initialState() {
     this.setState({
-      name: "",
-      contact: "",
-      address: ""
+      newUser: {
+        name: "",
+        contact: "",
+        address: ""
+      }
+    });
+  }
+  handleUpdate(e) {
+    e.preventDefault();
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Update it!"
+    }).then(result => {
+      if (result.value) {
+        const supplier = {
+          id: this.state.newUser.id,
+          supplierName: this.state.newUser.name,
+          supplierAddress: this.state.newUser.address,
+          supplierContact: this.state.newUser.contact
+        };
+        axios
+          .put(`http://localhost:56996/api/Supplier`, { ...supplier })
+          .then(res => {
+            console.log(res);
+            console.log(res.data);
+            this.loadData();
+            this.initialState();
+            if (res.data.success) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: res.data.successMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            } else {
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: res.data.failureMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            }
+          });
+      }
     });
   }
   handleSubmit = e => {
     e.preventDefault();
-    // showFormErrors("#root > div > form > div > div > input,select");
-
     showFormErrors("#root > div > div.card > div > form > div:nth-child(1)");
-
-    // console.log("Component state:", JSON.stringify(this.state));
     const customer = {
       SupplierName: this.state.newUser.name,
       SupplierContact: this.state.newUser.contact,
       SupplierAddress: this.state.newUser.address
     };
-
     if (this.handleIsEnabled())
       axios
         .post(`http://localhost:56996/api/Supplier`, { ...customer })
@@ -110,10 +156,7 @@ class Supplier extends Component {
           }
         });
   };
-  handleUpdate(e) {
-    e.preventDefault();
-    console.log("update clicked");
-  }
+
   handleClearForm(e) {
     e.preventDefault();
     this.setState({
@@ -174,10 +217,12 @@ class Supplier extends Component {
           buttonsavetitle={"Save"}
           buttonsaveaction={this.handleSubmit}
           buttonsaveclass={"btn btn-success"}
+          buttonsavedisabled={this.state.newUser.id ? true : false}
           //
           buttonupdatetitle={"Update"}
           buttonupdateaction={this.handleUpdate}
           buttonupdateclass={"btn btn-primary"}
+          buttonupdatedisable={!this.state.newUser.id}
           //
           buttoncleartitle={"Clear"}
           buttonclearaction={this.handleClearForm}

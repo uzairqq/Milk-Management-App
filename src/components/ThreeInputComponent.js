@@ -57,11 +57,13 @@ const ThreeInputComponent = props => {
             action={props.buttonsaveaction}
             title={props.buttonsavetitle}
             class={props.buttonsaveclass}
+            disable={props.buttonsavedisabled}
           />
           <ButtonComponent
             action={props.buttonupdateaction}
             title={props.buttonupdatetitle}
             class={props.buttonupdateclass}
+            disable={props.buttonupdatedisable}
           />
           <ButtonComponent
             action={props.buttonclearaction}
