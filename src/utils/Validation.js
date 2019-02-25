@@ -51,7 +51,5 @@ export function showInputError(input) {
       default:
         break;
     }
-  } catch (err) {
-    debugger;
-  }
+  } catch (err) {}
 }

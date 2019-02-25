@@ -27,6 +27,7 @@ class Supplier extends Component {
   }
   handleChange(e) {
     this.setState({ [e.target.name]: e.target.value });
+    showInputError(e.target);
   }
   handleDataForUpdate(val) {
     this.setState({
@@ -38,11 +39,15 @@ class Supplier extends Component {
     });
   }
   handleIsEnabled() {
-    const haveValues =
-      this.state.name !== "" &&
-      this.state.address !== "" &&
-      this.state.contact !== "";
-    return haveValues;
+    if (
+      this.state.newUser.name === "" &&
+      this.state.newUser.address === "" &&
+      this.state.newUser.contact === ""
+    )
+      return false;
+    else {
+      return true;
+    }
   }
 
   loadData() {
@@ -66,16 +71,18 @@ class Supplier extends Component {
   }
   handleSubmit = e => {
     e.preventDefault();
-    showFormErrors("#root > div > form > div > div > input,select");
+    // showFormErrors("#root > div > form > div > div > input,select");
+
+    showFormErrors("#root > div > div.card > div > form > div:nth-child(1)");
 
     // console.log("Component state:", JSON.stringify(this.state));
     const customer = {
-      name: this.state.name,
-      address: this.state.contact,
-      contact: this.state.address
+      SupplierName: this.state.newUser.name,
+      SupplierContact: this.state.newUser.contact,
+      SupplierAddress: this.state.newUser.address
     };
 
-    if (this.handleIsEnabled() === true)
+    if (this.handleIsEnabled())
       axios
         .post(`http://localhost:56996/api/Supplier`, { ...customer })
         .then(res => {
@@ -125,6 +132,7 @@ class Supplier extends Component {
   handleInput(e) {
     let value = e.target.value;
     let name = e.target.name;
+
     this.setState(
       prevState => {
         return {
@@ -136,6 +144,8 @@ class Supplier extends Component {
       },
       () => console.log(this.state.newUser)
     );
+    this.setState({ [e.target.name]: e.target.value });
+    showInputError(e.target);
   }
   render() {
     return (

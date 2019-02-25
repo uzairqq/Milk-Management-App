@@ -88,9 +88,8 @@ class Customer extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    showFormErrors(
-      "#root > div > div.card > div > form > div:nth-child(1) > div"
-    );
+
+    showFormErrors("#root > div > form > div > div > input,select");
     // console.log("Component state:", JSON.stringify(this.state));
 
     const customer = {
