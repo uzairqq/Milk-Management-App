@@ -22,6 +22,7 @@ class CustomerRates extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
   }
   initialState() {
     this.setState({
@@ -133,6 +134,50 @@ class CustomerRates extends Component {
       }
     });
   };
+  handleUpdate(e) {
+    e.preventDefault();
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Update it!"
+    }).then(result => {
+      if (result.value) {
+        const customer = {
+          id: this.state.id,
+          CustomerId: this.state.customerId,
+          CurrentRate: this.state.currentRate,
+          PreviousRate: this.state.previousRate
+        };
+        axios
+          .put(`http://localhost:56996/api/CustomerRates/`, { ...customer })
+          .then(res => {
+            this.loadData();
+            this.initialState();
+            if (res.data.success) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: res.data.successMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            } else {
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: res.data.failureMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            }
+          });
+      }
+    });
+  }
   loadData() {
     fetch("http://localhost:56996/api/CustomerRates/all")
       .then(result => result.json())
@@ -202,6 +247,13 @@ class CustomerRates extends Component {
           title={"Save"}
           class={"btn btn-success"}
           disable={this.state.id ? true : false}
+          size={"lg"}
+        />{" "}
+        <ButtonComponent
+          action={this.handleUpdate}
+          title={"Update"}
+          class={"btn btn-primary"}
+          disable={!this.state.id}
           size={"lg"}
         />{" "}
         {this.state.gridVisible ? (
