@@ -49,15 +49,11 @@ class CustomerRates extends Component {
     this.setState({ gridVisible: !this.state.gridVisible });
   }
   handleIsEnabled() {
-    if (
-      this.state.customerId === 0 &&
-      this.state.currentRate === "" &&
-      this.state.previousRate === ""
-    ) {
-      return false;
-    } else {
-      return true;
-    }
+    const haveValues =
+      this.state.customerId !== 0 &&
+      this.state.previousRate !== "" &&
+      this.state.currentRate !== "";
+    return haveValues;
   }
 
   handleSubmit = e => {
