@@ -31,7 +31,32 @@ export function showInputError(input) {
           input.classList.add("is-valid");
         }
         break;
+      case "select":
+        if (input.value === "-1") {
+          error.textContent = `${label} is a required field`;
+          input.classList.add("is-invalid");
+          input.classList.remove("is-valid");
+        } else {
+          input.classList.remove("is-invalid");
+          input.classList.add("is-valid");
+        }
+        break;
       case "text":
+        if (!validity.valid) {
+          if (validity.valueMissing) {
+            error.textContent = `${label} is a required field`;
+            input.classList.add("is-invalid");
+            input.classList.remove("is-valid");
+          }
+          return false;
+        } else {
+          if (!validity.valueMissing) {
+            input.classList.remove("is-invalid");
+            input.classList.add("is-valid");
+          }
+        }
+        break;
+      case "number":
         if (!validity.valid) {
           if (validity.valueMissing) {
             error.textContent = `${label} is a required field`;

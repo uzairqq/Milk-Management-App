@@ -1,10 +1,10 @@
 import React from "react";
-import { FormGroup, Label, Input } from "reactstrap";
+import { FormGroup, Label, Input, FormFeedback } from "reactstrap";
 
 const InputFeilds = props => {
   return (
     <FormGroup>
-      <Label htmlFor={props.name}>{props.title}</Label>
+      <Label for={props.name}>{props.title}</Label>
       <Input
         name={props.name}
         type={props.type}
@@ -12,7 +12,9 @@ const InputFeilds = props => {
         id={props.name}
         value={props.value}
         onChange={props.handlechange}
+        required={props.required}
       />
+      <FormFeedback className="invalid" id={props.name + "Error"} />
     </FormGroup>
   );
 };

@@ -1,11 +1,22 @@
 import React, { Component } from "react";
-import { Container, Input, Label } from "reactstrap";
+import {
+  Container,
+  Input,
+  Label,
+  Card,
+  Form,
+  CardBody,
+  FormGroup,
+  Col,
+  FormFeedback
+} from "reactstrap";
 import axios from "axios";
 import InputComponent from "../Components/InputFeilds";
 import Swal from "sweetalert2";
 import { showFormErrors, showInputError } from "../utils/Validation";
 import ButtonComponent from "../Components/Button";
 import Grid from "../Components/Grid";
+import InputFeilds from "../Components/InputFeilds";
 
 class CustomerRates extends Component {
   constructor(props) {
@@ -13,8 +24,8 @@ class CustomerRates extends Component {
     this.state = {
       customersDropDown: [],
       customerId: 0,
-      currentRate: 0,
-      previousRate: 0,
+      currentRate: "",
+      previousRate: "",
       gridVisible: true
     };
     this.handleChange = this.handleChange.bind(this);
@@ -23,13 +34,14 @@ class CustomerRates extends Component {
     this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
+    this.handleClearForm = this.handleClearForm.bind(this);
   }
   initialState() {
     this.setState({
       id: 0,
       customerId: 0,
-      currentRate: 0,
-      previousRate: 0
+      currentRate: "",
+      previousRate: ""
     });
   }
   hideOrShowGrid(e) {
@@ -39,18 +51,19 @@ class CustomerRates extends Component {
   handleIsEnabled() {
     if (
       this.state.customerId === 0 &&
-      this.state.currentRate === 0 &&
-      this.state.previousRate === 0
-    )
+      this.state.currentRate === "" &&
+      this.state.previousRate === ""
+    ) {
       return false;
-    else {
+    } else {
       return true;
     }
   }
 
   handleSubmit = e => {
     e.preventDefault();
-    showFormErrors("#root > div > form > div > div > input,select");
+    showFormErrors("input,select");
+
     const customer = {
       CustomerId: this.state.customerId,
       CurrentRate: this.state.currentRate,
@@ -96,7 +109,7 @@ class CustomerRates extends Component {
       previousRate: val.previousRate
     });
   }
-  handleDelete = supplier => {
+  handleDelete = customer => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -109,7 +122,7 @@ class CustomerRates extends Component {
       if (result.value) {
         axios
           .delete(`http://localhost:56996/api/CustomerRates/`, {
-            data: supplier
+            data: customer
           })
           .then(res => {
             this.loadData();
@@ -134,8 +147,10 @@ class CustomerRates extends Component {
       }
     });
   };
+
   handleUpdate(e) {
     e.preventDefault();
+    // showFormErrors("#root > div > form > div > div > input,select");
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -190,11 +205,16 @@ class CustomerRates extends Component {
         console.log(customers);
       });
   }
+  handleClearForm(e) {
+    e.preventDefault();
+    this.initialState();
+  }
 
   componentDidMount() {
     this.loadDataDropDown();
     this.loadData();
   }
+
   loadDataDropDown() {
     axios
       .get(
@@ -210,52 +230,88 @@ class CustomerRates extends Component {
   render() {
     return (
       <Container>
-        <Label htmlFor={"customer"}>{"Select Customer"}</Label>
-        <Input
-          type="select"
-          value={this.state.customerId}
-          name="customerId"
-          onChange={this.handleChange}
-        >
-          <option value="seleect">Select Customer</option>
-          {this.state.customersDropDown.map(function(data, key) {
-            return (
-              <option key={key} value={data.customerId}>
-                {data.customerName}
-              </option>
-            );
-          })}
-        </Input>
-        <InputComponent
-          name={"currentRate"}
-          title={"Current Rate"}
-          type={"number"}
-          placeholder={"Enter Current Rate"}
-          value={this.state.currentRate}
-          handlechange={this.handleChange}
-        />
-        <InputComponent
-          title={"Previous Rate"}
-          name={"previousRate"}
-          type={"number"}
-          placeholder={"Enter Previous Rate"}
-          value={this.state.previousRate}
-          handlechange={this.handleChange}
-        />
-        <ButtonComponent
-          action={this.handleSubmit}
-          title={"Save"}
-          class={"btn btn-success"}
-          disable={this.state.id ? true : false}
-          size={"lg"}
-        />{" "}
-        <ButtonComponent
-          action={this.handleUpdate}
-          title={"Update"}
-          class={"btn btn-primary"}
-          disable={!this.state.id}
-          size={"lg"}
-        />{" "}
+        <h1>Customer Rates</h1>
+
+        <Card body outline color="warning">
+          <CardBody sm={5}>
+            <Form method="post" noValidate={true}>
+              <FormGroup row>
+                <Col sm={{ size: 6, order: 5, offset: 0 }}>
+                  <Label for={"customerId"}>{"Select Customer"}</Label>
+                  <Input
+                    type="select"
+                    value={this.state.customerId}
+                    name="customerId"
+                    id="customerId"
+                    onChange={this.handleChange}
+                    required={true}
+                  >
+                    <option value="-1">Select Customer</option>
+                    {this.state.customersDropDown.map(function(data, key) {
+                      return (
+                        <option key={key} value={data.customerId}>
+                          {data.customerName}
+                        </option>
+                      );
+                    })}
+                  </Input>
+                  <FormFeedback className="invalid" id="customerIdError" />
+                </Col>
+              </FormGroup>
+              <FormGroup row>
+                <Col sm={{ size: 6, order: 5, offset: 0 }}>
+                  <InputFeilds
+                    required={true}
+                    name={"currentRate"}
+                    title={"Current Rate"}
+                    placeholder={"Enter Current Rate"}
+                    value={this.state.currentRate}
+                    handlechange={this.handleChange}
+                  />
+                </Col>
+              </FormGroup>
+              <FormGroup row>
+                <Col sm={{ size: 6, order: 5, offset: 0 }}>
+                  <InputComponent
+                    required={true}
+                    title={"Previous Rate"}
+                    name={"previousRate"}
+                    type={"text"}
+                    placeholder={"Enter Previous Rate"}
+                    value={this.state.previousRate}
+                    handlechange={this.handleChange}
+                  />
+                </Col>
+              </FormGroup>
+              <ButtonComponent
+                action={this.handleSubmit}
+                title={"Save"}
+                class={"btn btn-success"}
+                disable={this.state.id ? true : false}
+                size={"lg"}
+              />{" "}
+              <ButtonComponent
+                action={this.handleUpdate}
+                title={"Update"}
+                class={"btn btn-info"}
+                disable={!this.state.id}
+                size={"lg"}
+              />{" "}
+              <ButtonComponent
+                action={this.handleClearForm}
+                title={"Clear All"}
+                class={"btn btn-danger"}
+                size={"lg"}
+              />{" "}
+              <ButtonComponent
+                action={this.hideOrShowGrid}
+                title={!this.state.gridVisible ? "Show Grid" : "Hide Grid"}
+                class={"btn btn-danger"}
+                size={"lg"}
+              />{" "}
+            </Form>
+          </CardBody>
+        </Card>
         {this.state.gridVisible ? (
           <Grid
             rowData={this.state.customers}
