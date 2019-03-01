@@ -26,7 +26,8 @@ class CustomerRates extends Component {
       customerId: 0,
       currentRate: "",
       previousRate: "",
-      gridVisible: true
+      gridVisible: true,
+      customerType: -1
     };
     this.handleChange = this.handleChange.bind(this);
     this.updateValue = this.updateValue.bind(this);
@@ -35,6 +36,8 @@ class CustomerRates extends Component {
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleClearForm = this.handleClearForm.bind(this);
+    this.loadData = this.loadData.bind(this);
+    this.handleCustomerTypeChange = this.handleCustomerTypeChange.bind(this);
   }
   initialState() {
     this.setState({
@@ -59,7 +62,6 @@ class CustomerRates extends Component {
   handleSubmit = e => {
     e.preventDefault();
     showFormErrors("input,select");
-
     const customer = {
       CustomerId: this.state.customerId,
       CurrentRate: this.state.currentRate,
@@ -69,7 +71,7 @@ class CustomerRates extends Component {
       axios
         .post(`http://localhost:56996/api/CustomerRates`, { ...customer })
         .then(res => {
-          this.loadData();
+          this.loadData(this.state.customerType);
           this.initialState();
 
           if (res.data.success) {
@@ -93,7 +95,9 @@ class CustomerRates extends Component {
   };
 
   handleChange = e => {
-    this.setState({ [e.target.name]: e.target.value });
+    this.setState({
+      [e.target.name]: e.target.value
+    });
     console.log(this.state);
     showInputError(e.target);
   };
@@ -121,7 +125,7 @@ class CustomerRates extends Component {
             data: customer
           })
           .then(res => {
-            this.loadData();
+            this.loadData(this.state.customerType);
             if (res.data.success) {
               Swal.fire({
                 position: "top-end",
@@ -146,7 +150,7 @@ class CustomerRates extends Component {
 
   handleUpdate(e) {
     e.preventDefault();
-    // showFormErrors("#root > div > form > div > div > input,select");
+    showFormErrors("input,select");
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -166,7 +170,7 @@ class CustomerRates extends Component {
         axios
           .put(`http://localhost:56996/api/CustomerRates/`, { ...customer })
           .then(res => {
-            this.loadData();
+            this.loadData(this.state.customerType);
             this.initialState();
             if (res.data.success) {
               Swal.fire({
@@ -189,17 +193,21 @@ class CustomerRates extends Component {
       }
     });
   }
-  loadData() {
-    fetch("http://localhost:56996/api/CustomerRates/all")
-      .then(result => result.json())
-      .then(customers => {
-        customers.forEach(i => {
-          i.handleDataForUpdate = this.handleDataForUpdate;
-          i.handleDelete = this.handleDelete;
+  loadData(customerTypeValue) {
+    if (customerTypeValue !== -1)
+      fetch(
+        "http://localhost:56996/api/CustomerRates/all/typeId/" +
+          customerTypeValue
+      )
+        .then(result => result.json())
+        .then(customers => {
+          customers.forEach(i => {
+            i.handleDataForUpdate = this.handleDataForUpdate;
+            i.handleDelete = this.handleDelete;
+          });
+          this.setState({ customers });
+          console.log(customers);
         });
-        this.setState({ customers });
-        console.log(customers);
-      });
   }
   handleClearForm(e) {
     e.preventDefault();
@@ -207,34 +215,67 @@ class CustomerRates extends Component {
   }
 
   componentDidMount() {
-    this.loadDataDropDown();
-    this.loadData();
+    // this.loadDataDropDown();
+    this.loadData(0);
   }
 
-  loadDataDropDown() {
-    axios
-      .get(
-        "http://localhost:56996/api/CustomerRates/customersForCustomerRatesDropdown"
-      )
-      .then(res => {
-        this.setState({ customersDropDown: res.data });
-        console.log("Load Parent", res.data);
-      });
+  loadDataDropDown(id) {
+    if (id !== -1) {
+      axios
+        .get(
+          "http://localhost:56996/api/CustomerRates/customersForCustomerRatesDropdown/typeId/" +
+            id
+        )
+        .then(res => {
+          this.setState({ customersDropDown: res.data });
+          console.log("Load Parent", res.data);
+        });
+    }
   }
-
+  handleCustomerTypeChange(e) {
+    this.setState(
+      {
+        customerType: e.target.value
+      },
+      () => {
+        this.loadData(this.state.customerType);
+        this.loadDataDropDown(this.state.customerType);
+      }
+    );
+  }
   updateValue(value) {}
   render() {
     return (
       <Container>
         <h1>Customer Rates</h1>
-
         <Card body outline color="warning">
           <CardBody sm={5}>
             <Form method="post" noValidate={true}>
               <FormGroup row>
                 <Col sm={{ size: 6, order: 5, offset: 0 }}>
+                  <Label for={"customerType"}>{"Customer Type"}</Label>
+                  <Input
+                    onChange={this.handleCustomerTypeChange}
+                    type="select"
+                    value={this.state.customerType}
+                    name="customerType"
+                    id="customerType"
+
+                    // required={true}
+                  >
+                    <option value="-1">Select Customer Type</option>
+                    <option value="0">All</option>
+                    <option value="1">Daily</option>
+                    <option value="2">Weekly</option>
+                  </Input>
+                  <FormFeedback className="invalid" id="customerTypeError" />
+                </Col>
+              </FormGroup>
+              <FormGroup row>
+                <Col sm={{ size: 6, order: 5, offset: 0 }}>
                   <Label for={"customerId"}>{"Select Customer"}</Label>
                   <Input
+                    autoFocus
                     type="select"
                     value={this.state.customerId}
                     name="customerId"
@@ -257,6 +298,7 @@ class CustomerRates extends Component {
               <FormGroup row>
                 <Col sm={{ size: 6, order: 5, offset: 0 }}>
                   <InputFeilds
+                    type={"number"}
                     required={true}
                     name={"currentRate"}
                     title={"Current Rate"}
@@ -269,6 +311,7 @@ class CustomerRates extends Component {
               <FormGroup row>
                 <Col sm={{ size: 6, order: 5, offset: 0 }}>
                   <InputComponent
+                    type={"number"}
                     required={true}
                     title={"Previous Rate"}
                     name={"previousRate"}
