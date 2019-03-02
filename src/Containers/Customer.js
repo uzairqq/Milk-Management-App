@@ -364,12 +364,12 @@ class Customer extends Component {
         <Grid
           rowData={this.state.customers}
           columnDef={[
-            {
-              headerName: "Id",
-              field: "id",
-              checkboxSelection: true,
-              editable: true
-            },
+            // {
+            //   headerName: "Id",
+            //   field: "id",
+            //   checkboxSelection: true,
+            //   editable: true
+            // },
             {
               headerName: "Customer Type",
               field: "type",

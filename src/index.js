@@ -4,6 +4,7 @@ import * as serviceWorker from "./serviceWorker";
 import "bootstrap/dist/css/bootstrap.min.css";
 // import Supplier from "./Containers/Supplier";
 import CustomerRates from "./Containers/CustomerRates";
+// import Customer from "./Containers/Customer";
 
 ReactDOM.render(<CustomerRates />, document.getElementById("root"));
 
