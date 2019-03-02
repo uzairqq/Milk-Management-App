@@ -23,7 +23,7 @@ class CustomerRates extends Component {
     super(props);
     this.state = {
       customersDropDown: [],
-      customerId: 0,
+      customerId: -1,
       currentRate: "",
       previousRate: "",
       gridVisible: true,
@@ -41,6 +41,7 @@ class CustomerRates extends Component {
   }
   initialState() {
     this.setState({
+      customerType: -1,
       id: 0,
       customerId: 0,
       currentRate: "",
@@ -72,6 +73,7 @@ class CustomerRates extends Component {
         .post(`http://localhost:56996/api/CustomerRates`, { ...customer })
         .then(res => {
           this.loadData(this.state.customerType);
+          this.loadDataDropDown(this.state.customerType);
           this.initialState();
 
           if (res.data.success) {
@@ -126,6 +128,8 @@ class CustomerRates extends Component {
           })
           .then(res => {
             this.loadData(this.state.customerType);
+            this.loadDataDropDown(this.state.customerType);
+            this.initialState();
             if (res.data.success) {
               Swal.fire({
                 position: "top-end",
@@ -171,6 +175,7 @@ class CustomerRates extends Component {
           .put(`http://localhost:56996/api/CustomerRates/`, { ...customer })
           .then(res => {
             this.loadData(this.state.customerType);
+            this.loadDataDropDown(this.state.customerType);
             this.initialState();
             if (res.data.success) {
               Swal.fire({
@@ -315,7 +320,6 @@ class CustomerRates extends Component {
                     required={true}
                     title={"Previous Rate"}
                     name={"previousRate"}
-                    type={"text"}
                     placeholder={"Enter Previous Rate"}
                     value={this.state.previousRate}
                     handlechange={this.handleChange}
@@ -355,20 +359,20 @@ class CustomerRates extends Component {
           <Grid
             rowData={this.state.customers}
             columnDef={[
-              {
-                headerName: "Id",
-                field: "id",
-                checkboxSelection: true,
-                editable: true,
-                width: 200
-              },
-              {
-                headerName: "Customer Id",
-                field: "customerId",
-                checkboxSelection: true,
-                editable: true,
-                width: 200
-              },
+              // {
+              //   headerName: "Id",
+              //   field: "id",
+              //   checkboxSelection: true,
+              //   editable: true,
+              //   width: 200
+              // },
+              // {
+              //   headerName: "Customer Id",
+              //   field: "customerId",
+              //   checkboxSelection: true,
+              //   editable: true,
+              //   width: 200
+              // },
               {
                 headerName: "Customer Type",
                 field: "type",

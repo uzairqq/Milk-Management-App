@@ -21,10 +21,7 @@ class Grid extends Component {
   }
   render() {
     return (
-      <div
-        style={{ height: "300px", width: "1110px" }}
-        className="ag-theme-blue"
-      >
+      <div style={{ height: "300px", width: "auto" }} className="ag-theme-blue">
         <AgGridReact
           columnDefs={this.props.columnDef}
           rowData={this.props.rowData}
