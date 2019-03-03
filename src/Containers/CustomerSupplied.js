@@ -13,6 +13,7 @@ import {
 } from "reactstrap";
 import InputFeilds from "../Components/InputFeilds";
 import ButtonComponent from "../Components/Button";
+import Swal from "sweetalert2";
 
 class CustomerSupplied extends Component {
   constructor(props) {
@@ -24,11 +25,14 @@ class CustomerSupplied extends Component {
       morningMilk: "",
       afternoonMilk: "",
       debitAmount: 0,
-      customerType: -1
+      customerType: -1,
+      morningUnit: "Kg",
+      afternoonUnit: "Kg"
     };
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleCustomerTypeChange = this.handleCustomerTypeChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
   componentDidMount() {
     this.loadDataDropDown();
@@ -67,6 +71,58 @@ class CustomerSupplied extends Component {
         console.log("Load Parent", res.data);
       });
   }
+  handleIsEnabled() {
+    const haveValues =
+      this.state.customerType !== -1 &&
+      this.state.customerId !== 0 &&
+      this.state.morningMilk !== "" &&
+      this.state.morningUnit !== "" &&
+      this.state.afternoonMilk !== "" &&
+      this.state.afternoonUnit !== "" &&
+      this.state.debitAmount !== "";
+    return haveValues;
+  }
+  handleSubmit = e => {
+    e.preventDefault();
+    // showFormErrors("input,select,radio");
+    const customerSupplied = {
+      CustomerTypeId: this.state.customerType,
+      CustomerId: this.state.customerId,
+      MorningSupply: this.state.morningMilk + " " + this.state.morningUnit,
+      AfternoonSupply:
+        this.state.afternoonMilk + " " + this.state.afternoonUnit,
+      Debit: this.state.debitAmount
+    };
+    if (this.handleIsEnabled())
+      axios
+        .post(`http://localhost:56996/api/CustomerSupplied`, {
+          ...customerSupplied
+        })
+        .then(res => {
+          // this.loadData(this.state.customerType);
+          this.loadDataDropDown(this.state.customerType);
+          // this.initialState();
+
+          if (res.data.success) {
+            Swal.fire({
+              position: "top-end",
+              type: "success",
+              title: res.data.successMessage,
+              showConfirmButton: false,
+              timer: 1500
+            });
+          } else {
+            Swal.fire({
+              position: "top-end",
+              type: "error",
+              title: res.data.failureMessage,
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        });
+  };
+
   render() {
     return (
       <Container>
@@ -83,7 +139,6 @@ class CustomerSupplied extends Component {
                   value={this.state.customerType}
                   name="customerType"
                   id="customerType"
-
                   // required={true}
                 >
                   <option value="-1">Select Customer Type</option>
@@ -119,7 +174,7 @@ class CustomerSupplied extends Component {
               </Col>
             </FormGroup>
             <FormGroup row>
-              <Col sm={{ size: 6, order: 5, offset: 0 }}>
+              <Col md={6}>
                 <InputFeilds
                   type={"number"}
                   required={true}
@@ -130,6 +185,32 @@ class CustomerSupplied extends Component {
                   handlechange={this.handleChange}
                 />
               </Col>
+            </FormGroup>
+            <FormGroup tag="fieldset">
+              <legend>Morning Unit</legend>
+              <FormGroup check inline>
+                <Label check>
+                  <Input
+                    defaultChecked
+                    type="radio"
+                    name="morningUnit"
+                    value="Kg"
+                    onChange={this.handleChange}
+                  />{" "}
+                  Kg
+                </Label>
+              </FormGroup>
+              <FormGroup check inline>
+                <Label check>
+                  <Input
+                    type="radio"
+                    name="morningUnit"
+                    value="Mund"
+                    onChange={this.handleChange}
+                  />{" "}
+                  Mund
+                </Label>
+              </FormGroup>
             </FormGroup>
             <FormGroup row>
               <Col sm={{ size: 6, order: 5, offset: 0 }}>
@@ -143,6 +224,32 @@ class CustomerSupplied extends Component {
                   handlechange={this.handleChange}
                 />
               </Col>
+            </FormGroup>
+            <FormGroup tag="fieldset">
+              <legend>Afternon Unit</legend>
+              <FormGroup check inline>
+                <Label check>
+                  <Input
+                    defaultChecked
+                    type="radio"
+                    name="afternoonUnit"
+                    value="Kg"
+                    onChange={this.handleChange}
+                  />{" "}
+                  Kg
+                </Label>
+              </FormGroup>
+              <FormGroup check inline>
+                <Label check>
+                  <Input
+                    type="radio"
+                    name="afternoonUnit"
+                    value="Mund"
+                    onChange={this.handleChange}
+                  />{" "}
+                  Mund
+                </Label>
+              </FormGroup>
             </FormGroup>
             <FormGroup row>
               <Col sm={{ size: 6, order: 5, offset: 0 }}>
@@ -158,14 +265,14 @@ class CustomerSupplied extends Component {
               </Col>
             </FormGroup>
             <ButtonComponent
-              // action={this.handleSubmit}
+              action={this.handleSubmit}
               title={"Save"}
               class={"btn btn-success"}
               disable={this.state.customerSuppliedid ? true : false}
               size={"lg"}
             />{" "}
             <ButtonComponent
-              // action={this.handleUpdate}
+              //action={this.handleUpdate}
               title={"Update"}
               class={"btn btn-info"}
               disable={!this.state.customerSuppliedid}
