@@ -30,7 +30,7 @@ class CustomerSupplied extends Component {
       customerType: -1,
       morningUnit: "Mund",
       afternoonUnit: "Kg",
-      selectedDate: "2019-03-04"
+      selectedDate: new Date().toISOString().substr(0, 10)
     };
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -42,6 +42,52 @@ class CustomerSupplied extends Component {
   componentDidMount() {
     this.loadData(this.state.selectedDate);
     this.loadDataDropDown();
+  }
+  handleUpdate(e) {
+    e.preventDefault();
+    // showFormErrors("input,select");
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Update it!"
+    }).then(result => {
+      if (result.value) {
+        const customer = {
+          id: this.state.id,
+          CustomerId: this.state.customerId,
+          CurrentRate: this.state.currentRate,
+          PreviousRate: this.state.previousRate
+        };
+        axios
+          .put(`http://localhost:56996/api/CustomerRates/`, { ...customer })
+          .then(res => {
+            this.loadData(this.state.customerType);
+            this.loadDataDropDown(this.state.customerType);
+            this.initialState();
+            if (res.data.success) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: res.data.successMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            } else {
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: res.data.failureMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            }
+          });
+      }
+    });
   }
 
   handleChange = e => {
@@ -133,7 +179,8 @@ class CustomerSupplied extends Component {
     if (customerTypeValue !== -1)
       fetch(
         "http://localhost:56996/api/CustomerSupplied/all/selectedDate/" +
-          this.state.selectedDate
+          "2019-03-04"
+        // this.state.selectedDate
       )
         .then(result => result.json())
         .then(customers => {
@@ -216,8 +263,8 @@ class CustomerSupplied extends Component {
           <CardBody sm={5}>
             <Form method="post" noValidate={true} />
             <FormGroup row>
-              <Col sm={{ size: 6, order: 5, offset: 0 }}>
-                <Label for="selectedDate">Date</Label>
+              <Col sm={{ size: 4, order: 1, offset: 4 }}>
+                <Label for="selectedDate">Select Date:</Label>
                 <Input
                   type="date"
                   name="selectedDate"
