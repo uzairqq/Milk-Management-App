@@ -38,6 +38,7 @@ class CustomerSupplied extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.loadData = this.loadData.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
+    this.handleSelectedDate = this.handleSelectedDate.bind(this);
   }
   componentDidMount() {
     this.loadData(this.state.selectedDate);
@@ -179,8 +180,7 @@ class CustomerSupplied extends Component {
     if (customerTypeValue !== -1)
       fetch(
         "http://localhost:56996/api/CustomerSupplied/all/selectedDate/" +
-          "2019-03-04"
-        // this.state.selectedDate
+          this.state.selectedDate
       )
         .then(result => result.json())
         .then(customers => {
@@ -212,6 +212,16 @@ class CustomerSupplied extends Component {
       this.state.afternoonUnit !== "" &&
       this.state.debitAmount !== "";
     return haveValues;
+  }
+  handleSelectedDate(e) {
+    this.setState(
+      {
+        selectedDate: e.target.value
+      },
+      () => {
+        this.loadData();
+      }
+    );
   }
   handleSubmit = e => {
     e.preventDefault();
@@ -270,7 +280,7 @@ class CustomerSupplied extends Component {
                   name="selectedDate"
                   id="selectedDate"
                   placeholder="Select Date"
-                  onChange={this.handleChange}
+                  onChange={this.handleSelectedDate}
                   value={this.state.selectedDate}
                 />
               </Col>
