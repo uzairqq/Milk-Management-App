@@ -14,6 +14,7 @@ import {
 import InputFeilds from "../Components/InputFeilds";
 import ButtonComponent from "../Components/Button";
 import Swal from "sweetalert2";
+import Grid from "../Components/Grid";
 
 class CustomerSupplied extends Component {
   constructor(props) {
@@ -22,19 +23,24 @@ class CustomerSupplied extends Component {
       customerSuppliedid: 0,
       customerId: -1,
       customersDropDown: [],
+      customers: [],
       morningMilk: "",
       afternoonMilk: "",
       debitAmount: 0,
       customerType: -1,
-      morningUnit: "Kg",
-      afternoonUnit: "Kg"
+      morningUnit: "Mund",
+      afternoonUnit: "Kg",
+      selectedDate: "2019-03-04"
     };
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleCustomerTypeChange = this.handleCustomerTypeChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.loadData = this.loadData.bind(this);
+    this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
   }
   componentDidMount() {
+    this.loadData(this.state.selectedDate);
     this.loadDataDropDown();
   }
 
@@ -61,6 +67,84 @@ class CustomerSupplied extends Component {
       }
     );
   }
+  handleDelete = customer => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(result => {
+      if (result.value) {
+        axios
+          .delete(`http://localhost:56996/api/CustomerRates/`, {
+            data: customer
+          })
+          .then(res => {
+            this.loadData(this.state.customerType);
+            this.loadDataDropDown(this.state.customerType);
+            this.initialState();
+            if (res.data.success) {
+              Swal.fire({
+                position: "top-end",
+                type: "success",
+                title: res.data.successMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            } else {
+              Swal.fire({
+                position: "top-end",
+                type: "error",
+                title: res.data.failureMessage,
+                showConfirmButton: false,
+                timer: 2000
+              });
+            }
+          });
+      }
+    });
+  };
+
+  handleDataForUpdate(val) {
+    console.log("values", val);
+
+    this.setState(
+      {
+        // selectedDate: val.createdOn.toString().substring(0, 10),
+        customerSuppliedid: val.id,
+        customerType: val.customerTypeId,
+        customerId: val.customerId,
+        morningMilk: val.morningSupply.match(/\d+/g).map(Number)[0],
+        morningUnit: val.morningSupply.split(/(\d+)/)[2].trim(),
+        afternoonMilk: val.afternoonSupply.match(/\d+/g).map(Number)[0],
+        afternoonUnit: val.afternoonSupply.split(/(\d+)/)[2].trim(),
+        debitAmount: val.debit
+      },
+      () => {
+        console.log("Update After", this.state);
+      }
+    );
+  }
+
+  loadData(customerTypeValue) {
+    if (customerTypeValue !== -1)
+      fetch(
+        "http://localhost:56996/api/CustomerSupplied/all/selectedDate/" +
+          this.state.selectedDate
+      )
+        .then(result => result.json())
+        .then(customers => {
+          customers.forEach(i => {
+            i.handleDataForUpdate = this.handleDataForUpdate;
+            i.handleDelete = this.handleDelete;
+          });
+          this.setState({ customers });
+          console.log(customers);
+        });
+  }
   loadDataDropDown() {
     axios
       .get(
@@ -86,6 +170,7 @@ class CustomerSupplied extends Component {
     e.preventDefault();
     // showFormErrors("input,select,radio");
     const customerSupplied = {
+      CreatedOn: this.state.selectedDate,
       CustomerTypeId: this.state.customerType,
       CustomerId: this.state.customerId,
       MorningSupply: this.state.morningMilk + " " + this.state.morningUnit,
@@ -130,6 +215,19 @@ class CustomerSupplied extends Component {
         <Card body outline color="warning">
           <CardBody sm={5}>
             <Form method="post" noValidate={true} />
+            <FormGroup row>
+              <Col sm={{ size: 6, order: 5, offset: 0 }}>
+                <Label for="selectedDate">Date</Label>
+                <Input
+                  type="date"
+                  name="selectedDate"
+                  id="selectedDate"
+                  placeholder="Select Date"
+                  onChange={this.handleChange}
+                  value={this.state.selectedDate}
+                />
+              </Col>
+            </FormGroup>
             <FormGroup row>
               <Col sm={{ size: 6, order: 5, offset: 0 }}>
                 <Label for={"customerType"}>{"Customer Type"}</Label>
@@ -187,13 +285,12 @@ class CustomerSupplied extends Component {
               </Col>
             </FormGroup>
             <FormGroup tag="fieldset">
-              <legend>Morning Unit</legend>
               <FormGroup check inline>
                 <Label check>
                   <Input
-                    defaultChecked
                     type="radio"
                     name="morningUnit"
+                    checked={this.state.morningUnit === "Kg"}
                     value="Kg"
                     onChange={this.handleChange}
                   />{" "}
@@ -206,6 +303,7 @@ class CustomerSupplied extends Component {
                     type="radio"
                     name="morningUnit"
                     value="Mund"
+                    checked={this.state.morningUnit === "Mund"}
                     onChange={this.handleChange}
                   />{" "}
                   Mund
@@ -226,14 +324,13 @@ class CustomerSupplied extends Component {
               </Col>
             </FormGroup>
             <FormGroup tag="fieldset">
-              <legend>Afternon Unit</legend>
               <FormGroup check inline>
                 <Label check>
                   <Input
-                    defaultChecked
                     type="radio"
                     name="afternoonUnit"
                     value="Kg"
+                    checked={this.state.afternoonUnit === "Kg"}
                     onChange={this.handleChange}
                   />{" "}
                   Kg
@@ -245,6 +342,8 @@ class CustomerSupplied extends Component {
                     type="radio"
                     name="afternoonUnit"
                     value="Mund"
+                    checked={true}
+                    checked={this.state.afternoonUnit === "Mund"}
                     onChange={this.handleChange}
                   />{" "}
                   Mund
@@ -292,6 +391,105 @@ class CustomerSupplied extends Component {
             />{" "}
           </CardBody>
         </Card>
+        {/* {this.state.gridVisible ? ( */}
+        <Grid
+          rowData={this.state.customers}
+          columnDef={[
+            {
+              headerName: "Id",
+              field: "id",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Customer Id",
+              field: "customerId",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Customer Type",
+              field: "customerType",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Customer Name",
+              field: "customerName",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Morning Milk",
+              field: "morningSupply",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Morning Amount",
+              field: "morningAmount",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Afternoon Milk",
+              field: "afternoonSupply",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Afternoon Amount",
+              field: "afternoonAmount",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Rate",
+              field: "rate",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Debit",
+              field: "debit",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Credit",
+              field: "credit",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Total",
+              field: "total",
+              checkboxSelection: true,
+              editable: true,
+              width: 200
+            },
+            {
+              headerName: "Actions",
+              field: "value",
+              cellRenderer: "childMessageRenderer",
+              colId: "params",
+              width: 180,
+              editable: false
+            }
+          ]}
+        />
+        {/* ) : null} */}
       </Container>
     );
   }
