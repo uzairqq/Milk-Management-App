@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+// import BaseUrl from "../utils/BaseUrl";
 import {
   Container,
   Form,
@@ -22,7 +23,8 @@ class Customer extends Component {
       customerTypeId: -1,
       customerName: "",
       customerAddress: "",
-      customerContact: ""
+      customerContact: "",
+      customers: []
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -44,15 +46,17 @@ class Customer extends Component {
     });
   }
   loadData() {
-    fetch("http://localhost:56996/api/Customer/all")
-      .then(result => result.json())
-      .then(customers => {
-        customers.forEach(i => {
+    axios
+      .get("http://localhost:56996/api/Customer/all")
+      .then(res => {
+        const person = res.data;
+        person.forEach(i => {
           i.handleDataForUpdate = this.handleDataForUpdate;
           i.handleDelete = this.handleDelete;
         });
-        this.setState({ customers });
-      });
+        this.setState({ customers: person });
+      })
+      .catch(error => console.log(error));
   }
   handleDelete = val => {
     Swal.fire({
@@ -88,9 +92,7 @@ class Customer extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-
-    showFormErrors("#root > div > form > div > div > input,select");
-    // console.log("Component state:", JSON.stringify(this.state));
+    showFormErrors("input,select");
 
     const customer = {
       customerTypeId: this.state.customerTypeId,
@@ -99,7 +101,7 @@ class Customer extends Component {
       contact: this.state.customerContact
     };
 
-    if (this.handleIsEnabled() === true)
+    if (this.handleIsEnabled())
       axios
         .post(`http://localhost:56996/api/Customer`, { ...customer })
         .then(res => {
