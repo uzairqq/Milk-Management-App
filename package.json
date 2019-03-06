@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/react-fontawesome": "^0.1.4",
     "@trendmicro/react-sidenav": "^0.4.5",
     "ag-grid-community": "^19.1.4",
     "ag-grid-react": "^19.1.2",
