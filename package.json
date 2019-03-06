@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.15",
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@trendmicro/react-sidenav": "^0.4.5",
     "ag-grid-community": "^19.1.4",
@@ -14,6 +15,7 @@
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-react": "^7.12.0",
     "faker": "^4.1.0",
+    "font-awesome": "^4.7.0",
     "globalize": "^1.4.0",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.23",
