@@ -30,7 +30,7 @@ class CustomerSupplied extends Component {
       customerType: -1,
       morningUnit: "Mund",
       afternoonUnit: "Kg",
-      selectedDate: new Date().toISOString().substr(0, 10)
+      selectedDate: new Date().toDateString()
     };
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -42,7 +42,7 @@ class CustomerSupplied extends Component {
   }
   componentDidMount() {
     this.loadData(this.state.selectedDate);
-    this.loadDataDropDown();
+    this.loadDataDropDown(-1);
   }
   handleUpdate(e) {
     e.preventDefault();
@@ -176,8 +176,8 @@ class CustomerSupplied extends Component {
     );
   }
 
-  loadData(customerTypeValue) {
-    if (customerTypeValue !== -1)
+  loadData() {
+    if (this.state.selectedDate.length !== 0) {
       fetch(
         "http://localhost:56996/api/CustomerSupplied/all/selectedDate/" +
           this.state.selectedDate
@@ -191,16 +191,20 @@ class CustomerSupplied extends Component {
           this.setState({ customers });
           console.log(customers);
         });
+    }
   }
-  loadDataDropDown() {
-    axios
-      .get(
-        "http://localhost:56996/api/CustomerSupplied/customerSuppliedDropDown"
-      )
-      .then(res => {
-        this.setState({ customersDropDown: res.data });
-        console.log("Load Parent", res.data);
-      });
+  loadDataDropDown(typeId) {
+    if (typeId !== -1) {
+      axios
+        .get(
+          "http://localhost:56996/api/CustomerSupplied/customerSuppliedDropDown/typeId/" +
+            typeId
+        )
+        .then(res => {
+          this.setState({ customersDropDown: res.data });
+          console.log("Load Parent", res.data);
+        });
+    }
   }
   handleIsEnabled() {
     const haveValues =
