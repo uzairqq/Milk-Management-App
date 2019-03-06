@@ -1,19 +1,16 @@
 import React, { Component } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
-
-const TestingComponent = () => {
-  return (
-    <div>
-      <h1>New Testing Component</h1>
-    </div>
-  );
-};
+import Home from "../Containers/Home";
+import Customer from "../Containers/Customer";
 
 class App extends Component {
   render() {
     return (
       <BrowserRouter>
-        <Route path="/new" component={TestingComponent} />
+        <div>
+          <Route path="/" component={Home} exact />
+          <Route path="/newCustomer" component={Customer} />
+        </div>
       </BrowserRouter>
     );
   }
