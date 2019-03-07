@@ -28,12 +28,15 @@ class Customer extends Component {
       customerName: "",
       customerAddress: "",
       customerContact: "",
-      customers: []
+      customers: [],
+      gridVisible: true
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
+    this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
+    this.initialState = this.initialState.bind(this);
   }
 
   componentDidMount() {
@@ -127,13 +130,19 @@ class Customer extends Component {
   initialState() {
     this.setState({
       id: 0,
-      customerTypeId: -1,
+      // customerTypeId: -1,// we dont want to clear customer type .. user dont have to select again .
       customerName: "",
       customerContact: "",
       customerAddress: ""
     });
   }
-  handleUpdate() {
+  hideOrShowGrid(e) {
+    e.preventDefault();
+    this.setState({ gridVisible: !this.state.gridVisible });
+  }
+  handleUpdate(e) {
+    e.preventDefault();
+    showFormErrors("input,select");
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -152,8 +161,6 @@ class Customer extends Component {
           contact: this.state.customerContact
         };
         BaseUrl.put(`/Customer`, { ...customer }).then(res => {
-          console.log(res);
-          console.log(res.data);
           this.loadData();
           this.initialState();
           if (res.data.success) {
@@ -175,6 +182,7 @@ class Customer extends Component {
           }
         });
       }
+      clearInputsColours("input,select");
     });
   }
   handleDelete = cust => {
@@ -296,95 +304,70 @@ class Customer extends Component {
           <FormGroup row={true}>
             <Button
               disabled={this.state.id ? true : false}
-              className="mr-3"
+              className="btn btn-success"
               onClick={this.handleSubmit}
+              size={"lg"}
             >
               Add
             </Button>
-            <Button disabled={!this.state.id} onClick={this.handleUpdate}>
+            {"  "}
+            <Button
+              disabled={!this.state.id}
+              className={"btn btn-info"}
+              onClick={this.handleUpdate}
+            >
               Update
+            </Button>
+            {""}
+            <Button className={"btn btn-danger"} onClick={this.initialState}>
+              Clear Form
+            </Button>
+            {""}
+            <Button onClick={this.hideOrShowGrid}>
+              {!this.state.gridVisible ? "Show Grid" : "Hide Grid"}
             </Button>
           </FormGroup>
         </Form>
-        {/* <Table striped={true} responsive={true}>
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Customer Type</th>
-              <th>Customer Name</th>
-              <th>Customer Contact</th>
-              <th>Customer Address</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.customers.map(cust => (
-              <tr key={cust.id}>
-                <th scope="row">{cust.id}</th>
-                <td>{cust.type}</td>
-                <td>{cust.name}</td>
-                <td>{cust.address}</td>
-                <td>{cust.contact}</td>
-                <td>
-                  <Input
-                    type="button"
-                    value="Update"
-                    onClick={() => this.handleRowsValuesInTextBox(cust)}
-                  />
-                  <Input
-                    type="button"
-                    value="Delete"
-                    onClick={() => this.handleDelete(cust)}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table> */}
         <br />
-        <Grid
-          rowData={this.state.customers}
-          columnDef={[
-            // {
-            //   headerName: "Id",
-            //   field: "id",
-            //   checkboxSelection: true,
-            //   editable: true
-            // },
-            {
-              headerName: "Customer Type",
-              field: "type",
-              checkboxSelection: true,
-              editable: true
-            },
-            {
-              headerName: "Customer Name",
-              field: "name",
-              checkboxSelection: true,
-              editable: true
-            },
-            {
-              headerName: "Customer Address",
-              field: "address",
-              checkboxSelection: true,
-              editable: true
-            },
-            {
-              headerName: "Customer Contact",
-              field: "contact",
-              checkboxSelection: true,
-              editable: true
-            },
-            {
-              headerName: "Actions",
-              field: "value",
-              cellRenderer: "childMessageRenderer",
-              colId: "params",
-              width: 180,
-              editable: false
-            }
-          ]}
-        />
+        {this.state.gridVisible ? (
+          <Grid
+            rowData={this.state.customers}
+            columnDef={[
+              {
+                headerName: "Customer Type",
+                field: "type",
+                checkboxSelection: true,
+                editable: true
+              },
+              {
+                headerName: "Customer Name",
+                field: "name",
+                checkboxSelection: true,
+                editable: true
+              },
+              {
+                headerName: "Customer Address",
+                field: "address",
+                checkboxSelection: true,
+                editable: true
+              },
+              {
+                headerName: "Customer Contact",
+                field: "contact",
+                checkboxSelection: true,
+                editable: true
+              },
+              {
+                headerName: "Actions",
+                field: "value",
+                cellRenderer: "childMessageRenderer",
+                colId: "params",
+                width: 180,
+                editable: false
+              }
+            ]}
+          />
+        ) : null}
       </Container>
     );
   }
