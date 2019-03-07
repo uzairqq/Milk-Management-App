@@ -78,3 +78,11 @@ export function showInputError(input) {
     }
   } catch (err) {}
 }
+export function clearInputsColours(inputs) {
+  var inputs = document.querySelectorAll(inputs);
+  for (let index = 0; index < inputs.length; index++) {
+    const input = inputs[index];
+    input.classList.remove("is-invalid");
+    input.classList.remove("is-valid");
+  }
+}

@@ -198,7 +198,9 @@ class CustomerSupplied extends Component {
       axios
         .get(
           "http://localhost:56996/api/CustomerSupplied/customerSuppliedDropDown/typeId/" +
-            typeId
+            typeId +
+            "/date/" +
+            this.state.selectedDate
         )
         .then(res => {
           this.setState({ customersDropDown: res.data });
