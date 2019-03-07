@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import axios from "axios";
-// import BaseUrl from "../utils/BaseUrl";
+// import axios from "axios";
+import BaseUrl from "../utils/BaseUrl";
 import {
   Container,
   Form,
@@ -13,7 +13,11 @@ import {
 } from "reactstrap";
 import Grid from "../Components/Grid";
 import Swal from "sweetalert2";
-import { showFormErrors, showInputError } from "../utils/Validation";
+import {
+  showFormErrors,
+  showInputError,
+  clearInputsColours
+} from "../utils/Validation";
 
 class Customer extends Component {
   constructor(props) {
@@ -45,9 +49,9 @@ class Customer extends Component {
       customerContact: val.contact
     });
   }
+
   loadData() {
-    axios
-      .get("http://localhost:56996/api/Customer/all")
+    BaseUrl.get("/Customer/all")
       .then(res => {
         const person = res.data;
         person.forEach(i => {
@@ -58,28 +62,6 @@ class Customer extends Component {
       })
       .catch(error => console.log(error));
   }
-  handleDelete = val => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
-    }).then(result => {
-      if (result.value) {
-        axios
-          .delete(`http://localhost:56996/api/Customer`, { data: val })
-          .then(res => {
-            console.log(res);
-            console.log(res.data);
-            this.loadData();
-            Swal.fire("Deleted!", "Your Record Has Been Deleted.", "success");
-          });
-      }
-    });
-  };
 
   handleIsEnabled() {
     const haveValues =
@@ -102,32 +84,31 @@ class Customer extends Component {
     };
 
     if (this.handleIsEnabled())
-      axios
-        .post(`http://localhost:56996/api/Customer`, { ...customer })
-        .then(res => {
-          this.loadData();
-          this.initialState();
-          console.log(res);
-          console.log(res.data);
+      BaseUrl.post(`/Customer`, { ...customer }).then(res => {
+        this.loadData();
+        this.initialState();
+        console.log(res);
+        console.log(res.data);
 
-          if (res.data.success) {
-            Swal.fire({
-              position: "top-end",
-              type: "success",
-              title: res.data.successMessage,
-              showConfirmButton: false,
-              timer: 1500
-            });
-          } else {
-            Swal.fire({
-              position: "top-end",
-              type: "error",
-              title: res.data.failureMessage,
-              showConfirmButton: false,
-              timer: 1500
-            });
-          }
-        });
+        if (res.data.success) {
+          Swal.fire({
+            position: "top-end",
+            type: "success",
+            title: res.data.successMessage,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } else {
+          Swal.fire({
+            position: "top-end",
+            type: "error",
+            title: res.data.failureMessage,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+        clearInputsColours("input,select");
+      });
   };
   handleChange(e) {
     this.setState({ [e.target.name]: e.target.value });
@@ -170,31 +151,29 @@ class Customer extends Component {
           address: this.state.customerAddress,
           contact: this.state.customerContact
         };
-        axios
-          .put(`http://localhost:56996/api/Customer`, { ...customer })
-          .then(res => {
-            console.log(res);
-            console.log(res.data);
-            this.loadData();
-            this.initialState();
-            if (res.data.success) {
-              Swal.fire({
-                position: "top-end",
-                type: "success",
-                title: res.data.successMessage,
-                showConfirmButton: false,
-                timer: 2000
-              });
-            } else {
-              Swal.fire({
-                position: "top-end",
-                type: "error",
-                title: res.data.failureMessage,
-                showConfirmButton: false,
-                timer: 2000
-              });
-            }
-          });
+        BaseUrl.put(`/Customer`, { ...customer }).then(res => {
+          console.log(res);
+          console.log(res.data);
+          this.loadData();
+          this.initialState();
+          if (res.data.success) {
+            Swal.fire({
+              position: "top-end",
+              type: "success",
+              title: res.data.successMessage,
+              showConfirmButton: false,
+              timer: 2000
+            });
+          } else {
+            Swal.fire({
+              position: "top-end",
+              type: "error",
+              title: res.data.failureMessage,
+              showConfirmButton: false,
+              timer: 2000
+            });
+          }
+        });
       }
     });
   }
@@ -209,30 +188,30 @@ class Customer extends Component {
       confirmButtonText: "Yes, delete it!"
     }).then(result => {
       if (result.value) {
-        axios
-          .delete(`http://localhost:56996/api/Customer`, { data: cust })
-          .then(res => {
-            console.log(res);
-            console.log(res.data);
-            this.loadData();
-            if (res.data.success) {
-              Swal.fire({
-                position: "top-end",
-                type: "success",
-                title: res.data.successMessage,
-                showConfirmButton: false,
-                timer: 2000
-              });
-            } else {
-              Swal.fire({
-                position: "top-end",
-                type: "error",
-                title: res.data.failureMessage,
-                showConfirmButton: false,
-                timer: 2000
-              });
-            }
-          });
+        BaseUrl.delete(`/Customer`, {
+          data: cust
+        }).then(res => {
+          console.log(res);
+          console.log(res.data);
+          this.loadData();
+          if (res.data.success) {
+            Swal.fire({
+              position: "top-end",
+              type: "success",
+              title: res.data.successMessage,
+              showConfirmButton: false,
+              timer: 2000
+            });
+          } else {
+            Swal.fire({
+              position: "top-end",
+              type: "error",
+              title: res.data.failureMessage,
+              showConfirmButton: false,
+              timer: 2000
+            });
+          }
+        });
       }
     });
   };
