@@ -13,18 +13,34 @@ import {
   Input,
   Row
 } from "reactstrap";
-import * as Yup from "yup";
 import "../Customer/Customer.css";
 import Grid from "../Components/Grid";
 import Api from "../../utils/BaseUrl";
+import Swal from "sweetalert2";
+import {
+  showFormErrors,
+  showInputError,
+  clearInputsColours
+} from "../../utils/Validation";
 
 class Customer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      customers: []
+      id: 0,
+      customerTypeId: -1,
+      customerName: "",
+      customerAddress: "",
+      customerContact: "",
+      customers: [],
+      gridVisible: true
     };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
+    this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
+    this.initialState = this.initialState.bind(this);
   }
   componentDidMount() {
     this.loadData();
@@ -39,6 +55,7 @@ class Customer extends React.Component {
           i.handleDelete = this.handleDelete;
         });
         this.setState({ customers: person });
+        console.log(person);
       })
       .catch(error => console.log(error));
   }
@@ -46,12 +63,167 @@ class Customer extends React.Component {
     this.setState({
       id: val.id,
       customerTypeId: val.customerTypeId,
-      customerType: val.type,
       customerName: val.name,
       customerAddress: val.address,
       customerContact: val.contact
     });
   }
+  handleIsEnabled() {
+    const haveValues =
+      this.state.customerTypeId !== 0 &&
+      this.state.customerName !== "" &&
+      this.state.customerAddress !== "" &&
+      this.state.customerContact !== "";
+    return haveValues;
+  }
+  handleSubmit = e => {
+    e.preventDefault();
+    showFormErrors("input,select");
+
+    const customer = {
+      customerTypeId: this.state.customerTypeId,
+      name: this.state.customerName,
+      address: this.state.customerAddress,
+      contact: this.state.customerContact
+    };
+
+    if (this.handleIsEnabled())
+      Api.post(`/Customer`, { ...customer }).then(res => {
+        this.loadData();
+        this.initialState();
+        console.log(res);
+        console.log(res.data);
+
+        if (res.data.success) {
+          Swal.fire({
+            position: "top-end",
+            type: "success",
+            title: res.data.successMessage,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } else {
+          Swal.fire({
+            position: "top-end",
+            type: "error",
+            title: res.data.failureMessage,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+        clearInputsColours("input,select");
+      });
+  };
+  handleChange(e) {
+    this.setState({ [e.target.name]: e.target.value });
+    showInputError(e.target);
+  }
+
+  handleRowsValuesInTextBox(e) {
+    this.setState({
+      id: e.id,
+      customerTypeId: e.customerTypeId,
+      customerName: e.name,
+      customerAddress: e.address,
+      customerContact: e.contact
+    });
+  }
+  initialState() {
+    this.setState({
+      id: 0,
+      // customerTypeId: -1,// we dont want to clear customer type .. user dont have to select again .
+      customerName: "",
+      customerContact: "",
+      customerAddress: ""
+    });
+  }
+  hideOrShowGrid(e) {
+    e.preventDefault();
+    this.setState({ gridVisible: !this.state.gridVisible });
+  }
+  handleUpdate(e) {
+    e.preventDefault();
+    showFormErrors("input,select");
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Update it!"
+    }).then(result => {
+      if (result.value) {
+        const customer = {
+          id: this.state.id,
+          customerTypeId: this.state.customerTypeId,
+          name: this.state.customerName,
+          address: this.state.customerAddress,
+          contact: this.state.customerContact
+        };
+        Api.put(`/Customer`, { ...customer }).then(res => {
+          this.loadData();
+          this.initialState();
+          if (res.data.success) {
+            Swal.fire({
+              position: "top-end",
+              type: "success",
+              title: res.data.successMessage,
+              showConfirmButton: false,
+              timer: 2000
+            });
+          } else {
+            Swal.fire({
+              position: "top-end",
+              type: "error",
+              title: res.data.failureMessage,
+              showConfirmButton: false,
+              timer: 2000
+            });
+          }
+        });
+      }
+      clearInputsColours("input,select");
+    });
+  }
+  handleDelete = cust => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(result => {
+      if (result.value) {
+        Api.delete(`/Customer`, {
+          data: cust
+        }).then(res => {
+          console.log(res);
+          console.log(res.data);
+          this.loadData();
+          if (res.data.success) {
+            Swal.fire({
+              position: "top-end",
+              type: "success",
+              title: res.data.successMessage,
+              showConfirmButton: false,
+              timer: 2000
+            });
+          } else {
+            Swal.fire({
+              position: "top-end",
+              type: "error",
+              title: res.data.failureMessage,
+              showConfirmButton: false,
+              timer: 2000
+            });
+          }
+        });
+      }
+    });
+  };
 
   render() {
     return (
@@ -71,25 +243,28 @@ class Customer extends React.Component {
                   noValidate
                 >
                   <FormGroup>
-                    <Label for="customerType">Customer Type</Label>
+                    <Label for="customerTypeId">Customer Type</Label>
                     <Input
                       type="select"
-                      name="customerType"
-                      id="customerType"
+                      name="customerTypeId"
+                      id="customerTypeId"
                       autoComplete="given-name"
-                      // valid={!errors.customerType}
-                      // invalid={touched.customerType && !!errors.customerType}
+                      // valid={this.state.customerTypeId > 0}
+                      // invalid={this.state.customerTypeId == -1}
                       autoFocus={true}
                       required
                       onChange={this.handleChange}
                       // onBlur={handleBlur}
-                      value={this.state.customerType}
+                      value={this.state.customerTypeId}
                     >
-                      <option value="">--Please Select--</option>
+                      <option value="-1">--Please Select--</option>
                       <option value="1">Daily</option>
                       <option value="2">Weekly</option>
                     </Input>
-                    <FormFeedback>{this.state.customerType}</FormFeedback>
+                    <FormFeedback
+                      className="invalid"
+                      id="customerTypeIdError"
+                    />
                   </FormGroup>
 
                   <FormGroup>
@@ -108,7 +283,7 @@ class Customer extends React.Component {
                       // onBlur={handleBlur}
                       value={this.state.customerName}
                     />
-                    <FormFeedback>{this.state.customerName}</FormFeedback>
+                    <FormFeedback className="invalid" id="customerNameError" />
                   </FormGroup>
                   <FormGroup>
                     <Label for="customerAddress">Customer Address</Label>
@@ -127,7 +302,10 @@ class Customer extends React.Component {
                       // onBlur={handleBlur}
                       value={this.state.customerAddress}
                     />
-                    <FormFeedback>{this.state.customerAddress}</FormFeedback>
+                    <FormFeedback
+                      className="invalid"
+                      id="customerAddressError"
+                    />
                   </FormGroup>
                   <FormGroup>
                     <Label for="customerContact">Customer Contact</Label>
@@ -146,28 +324,32 @@ class Customer extends React.Component {
                       // onBlur={handleBlur}
                       value={this.state.customerContact}
                     />
-                    <FormFeedback>{this.state.customerContact}</FormFeedback>
+                    <FormFeedback
+                      className="invalid"
+                      id="customerContactError"
+                    />
                   </FormGroup>
                   <FormGroup>
                     <Button
-                      type="submit"
                       color="primary"
                       className="mr-1"
-                      // disabled={isSubmitting || !isValid}
+                      onClick={this.handleSubmit}
+                      disabled={this.state.id}
                     >
                       {/* {isSubmitting ? "Wait..." : "Submit"} */}
-                      Submmit
+                      Submit
                     </Button>
                     <Button
                       type="submit"
                       color="secondary"
                       className="mr-1"
-                      // disabled={!values.id}
+                      onClick={this.handleUpdate}
+                      disabled={!this.state.id}
                     >
                       {/* {isSubmitting ? "Wait..." : "Update"} */}
                       Update
                     </Button>
-                    <Button
+                    {/* <Button
                       type="button"
                       color="success"
                       className="mr-1"
@@ -175,66 +357,93 @@ class Customer extends React.Component {
                       // disabled={isValid}
                     >
                       Validate
-                    </Button>
+                    </Button> */}
                     <Button
                       type="reset"
                       color="danger"
                       className="mr-1"
-                      // onClick={handleReset}
+                      onClick={this.initialState}
                     >
                       Reset
+                    </Button>
+                    <Button
+                      className={
+                        !this.state.gridVisible
+                          ? "btn btn-success"
+                          : "btn btn-secondary"
+                      }
+                      onClick={this.hideOrShowGrid}
+                    >
+                      {!this.state.gridVisible ? "Show Grid" : "Hide Grid"}
                     </Button>
                   </FormGroup>
                 </Form>
               </Col>
               <Col lg="6">
-                <Card /*className={isValid ? "bg-info" : "bg-secondary"}*/>
+                <Card className="bg-info">
                   <CardBody>
-                    {/* <pre>values: {JSON.stringify(values, null, 2)}</pre> */}
-                    {/* <pre>errors: {JSON.stringify(errors, null, 2)}</pre> */}
-                    {/* <pre>touched: {JSON.stringify(touched, null, 2)}</pre> */}
+                    <h1>Total Hotels: {this.state.customers.length}</h1>
+                    <h1>
+                      Total Daily Hotels:{" "}
+                      {
+                        this.state.customers.filter(i => i.customerTypeId === 1)
+                          .length
+                      }
+                    </h1>
+                    <h1>
+                      Total Weekly Hotels:{" "}
+                      {
+                        this.state.customers.filter(i => i.customerTypeId === 2)
+                          .length
+                      }
+                    </h1>
+                    {/* <pre>values: {JSON.stringify(values, null, 2)}</pre>
+                    <pre>errors: {JSON.stringify(errors, null, 2)}</pre>
+                    <pre>touched: {JSON.stringify(touched, null, 2)}</pre> */}
                   </CardBody>
                 </Card>
               </Col>
             </Row>
             <hr />
-            <Grid
-              rowData={this.state.customers}
-              columnDef={[
-                {
-                  headerName: "Customer Type",
-                  field: "type",
-                  checkboxSelection: true,
-                  editable: true
-                },
-                {
-                  headerName: "Customer Name",
-                  field: "name",
-                  checkboxSelection: true,
-                  editable: true
-                },
-                {
-                  headerName: "Customer Address",
-                  field: "address",
-                  checkboxSelection: true,
-                  editable: true
-                },
-                {
-                  headerName: "Customer Contact",
-                  field: "contact",
-                  checkboxSelection: true,
-                  editable: true
-                },
-                {
-                  headerName: "Actions",
-                  field: "value",
-                  cellRenderer: "childMessageRenderer",
-                  colId: "params",
-                  width: 180,
-                  editable: false
-                }
-              ]}
-            />
+            {this.state.gridVisible ? (
+              <Grid
+                rowData={this.state.customers}
+                columnDef={[
+                  {
+                    headerName: "Customer Type",
+                    field: "type",
+                    checkboxSelection: true,
+                    editable: true
+                  },
+                  {
+                    headerName: "Customer Name",
+                    field: "name",
+                    checkboxSelection: true,
+                    editable: true
+                  },
+                  {
+                    headerName: "Customer Address",
+                    field: "address",
+                    checkboxSelection: true,
+                    editable: true
+                  },
+                  {
+                    headerName: "Customer Contact",
+                    field: "contact",
+                    checkboxSelection: true,
+                    editable: true
+                  },
+                  {
+                    headerName: "Actions",
+                    field: "value",
+                    cellRenderer: "childMessageRenderer",
+                    colId: "params",
+                    width: 180,
+                    editable: false
+                  }
+                ]}
+              />
+            ) : null}
           </CardBody>
         </Card>
       </div>

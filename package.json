@@ -64,6 +64,7 @@
     "reactstrap": "^6.5.0",
     "simple-line-icons": "^2.4.1",
     "spinkit": "1.2.5",
+    "sweetalert2": "^8.2.6",
     "yup": "^0.26.6"
   },
   "devDependencies": {
