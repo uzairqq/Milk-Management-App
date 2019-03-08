@@ -18,6 +18,11 @@ export default {
           name: "New Customer",
           url: "/customer",
           icon: "icon-puzzle"
+        },
+        {
+          name: "Customer Rates",
+          url: "/customerRates",
+          icon: "icon-puzzle"
         }
       ]
     }
