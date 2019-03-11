@@ -51,6 +51,17 @@ class CustomerSupplied extends Component {
     this.loadData(this.state.selectedDate);
     this.loadDataDropDown(-1);
   }
+  initialState() {
+    this.setState({
+      customerSuppliedid: 0,
+      customerId: -1,
+      morningMilk: "",
+      afternoonMilk: "",
+      debitAmount: 0,
+      morningUnit: "Mund",
+      afternoonUnit: "Kg"
+    });
+  }
   handleUpdate(e) {
     e.preventDefault();
     showFormErrors("input,select,radio");
@@ -93,6 +104,7 @@ class CustomerSupplied extends Component {
               timer: 2000
             });
           }
+          clearInputsColours("input,select");
         });
       }
     });
@@ -233,6 +245,7 @@ class CustomerSupplied extends Component {
   handleSubmit = e => {
     e.preventDefault();
     showFormErrors("input,select,radio");
+
     const customerSupplied = {
       CreatedOn: this.state.selectedDate,
       CustomerTypeId: this.state.customerType,
@@ -246,9 +259,9 @@ class CustomerSupplied extends Component {
       Api.post(`/CustomerSupplied`, {
         ...customerSupplied
       }).then(res => {
-        // this.loadData(this.state.customerType);
+        this.loadData(this.state.customerType);
         this.loadDataDropDown(this.state.customerType);
-        // this.initialState();
+        this.initialState();
 
         if (res.data.success) {
           Swal.fire({
@@ -267,6 +280,7 @@ class CustomerSupplied extends Component {
             timer: 1500
           });
         }
+        clearInputsColours("input,select");
       });
   };
   render() {
@@ -325,7 +339,7 @@ class CustomerSupplied extends Component {
                       // onBlur={handleBlur}
                     >
                       <option value="-1">Select Customer Type</option>
-                      <option value="0">All</option>
+                      {/* <option value="0">All</option> */}
                       <option value="1">Daily</option>
                       <option value="2">Weekly</option>
                     </Input>
