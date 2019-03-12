@@ -30,6 +30,18 @@ export default {
           icon: "icon-puzzle"
         }
       ]
+    },
+    {
+      name: "Supplier",
+      url: "/base",
+      icon: "icon-puzzle",
+      children: [
+        {
+          name: "New Supplier",
+          url: "/supplier",
+          icon: "icon-puzzle"
+        }
+      ]
     }
   ]
 };
