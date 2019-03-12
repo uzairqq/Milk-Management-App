@@ -58,8 +58,9 @@ class Supplier extends React.Component {
       .catch(error => console.log(error));
   }
   handleDataForUpdate(val) {
+    debugger;
     this.setState({
-      id: val.supplierId,
+      supplierId: val.id,
       supplierName: val.supplierName,
       supplierAddress: val.supplierAddress,
       supplierContact: val.supplierContact
@@ -124,7 +125,7 @@ class Supplier extends React.Component {
   }
   initialState() {
     this.setState({
-      id: 0,
+      supplierId: 0,
       supplierName: "",
       supplierContact: "",
       supplierAddress: ""
@@ -149,9 +150,9 @@ class Supplier extends React.Component {
       if (result.value) {
         const supplier = {
           id: this.state.supplierId,
-          name: this.state.supplierName,
-          address: this.state.supplierAddress,
-          contact: this.state.supplierContact
+          supplierName: this.state.supplierName,
+          supplierAddress: this.state.supplierAddress,
+          supplierContact: this.state.supplierContact
         };
         Api.put(`/Supplier`, { ...supplier }).then(res => {
           this.loadData();
@@ -301,7 +302,7 @@ class Supplier extends React.Component {
                       color="primary"
                       className="mr-1"
                       onClick={this.handleSubmit}
-                      disabled={this.state.id}
+                      disabled={this.state.supplierId ? true : false}
                     >
                       {/* {isSubmitting ? "Wait..." : "Submit"} */}
                       Submit
@@ -311,7 +312,7 @@ class Supplier extends React.Component {
                       color="secondary"
                       className="mr-1"
                       onClick={this.handleUpdate}
-                      disabled={!this.state.supplierId ? true : false}
+                      disabled={!this.state.supplierId}
                     >
                       {/* {isSubmitting ? "Wait..." : "Update"} */}
                       Update
@@ -360,7 +361,7 @@ class Supplier extends React.Component {
             <hr />
             {this.state.gridVisible ? (
               <Grid
-                rowData={this.state.customers}
+                rowData={this.state.suppliers}
                 columnDef={[
                   {
                     headerName: "Supplier Name",
