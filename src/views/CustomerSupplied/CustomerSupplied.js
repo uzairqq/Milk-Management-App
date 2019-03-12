@@ -46,6 +46,9 @@ class CustomerSupplied extends Component {
     this.loadData = this.loadData.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
     this.handleSelectedDate = this.handleSelectedDate.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
+    this.initialState = this.initialState.bind(this);
   }
   componentDidMount() {
     this.loadData(this.state.selectedDate);
@@ -64,7 +67,7 @@ class CustomerSupplied extends Component {
   }
   handleUpdate(e) {
     e.preventDefault();
-    showFormErrors("input,select,radio");
+    showFormErrors("input,select");
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -75,13 +78,21 @@ class CustomerSupplied extends Component {
       confirmButtonText: "Yes, Update it!"
     }).then(result => {
       if (result.value) {
+        debugger;
         const customer = {
-          id: this.state.id,
+          Id: this.state.customerSuppliedid,
+          //   CreatedOn: this.state.selectedDate,
+          LastUpdatedOn: this.state.selectedDate,
+          CustomerTypeId: this.state.customerType,
           CustomerId: this.state.customerId,
-          CurrentRate: this.state.currentRate,
-          PreviousRate: this.state.previousRate
+          MorningSupply: this.state.morningMilk + " " + this.state.morningUnit,
+          AfternoonSupply:
+            this.state.afternoonMilk + " " + this.state.afternoonUnit,
+          Debit: this.state.debitAmount
         };
-        Api.put(`/CustomerRates/`, {
+        console.log("abhi update", customer);
+        debugger;
+        Api.put(`/CustomerSupplied/`, {
           ...customer
         }).then(res => {
           this.loadData(this.state.customerType);
@@ -120,7 +131,7 @@ class CustomerSupplied extends Component {
       }
     );
     console.log("Un Updated State", this.state);
-    // showInputError(e.target);
+    showInputError(e.target);
   };
   handleCustomerTypeChange(e) {
     this.setState(
@@ -144,7 +155,7 @@ class CustomerSupplied extends Component {
       confirmButtonText: "Yes, delete it!"
     }).then(result => {
       if (result.value) {
-        Api.delete(`/CustomerRates/`, {
+        Api.delete(`/CustomerSupplied/`, {
           data: customer
         }).then(res => {
           this.loadData(this.state.customerType);
@@ -175,16 +186,20 @@ class CustomerSupplied extends Component {
   handleDataForUpdate(val) {
     console.log("values", val);
 
+    var a = val.afternoonSupply.match(/(\d+)/);
+    debugger;
+
+    debugger;
     this.setState(
       {
         // selectedDate: val.createdOn.toString().substring(0, 10),
         customerSuppliedid: val.id,
         customerType: val.customerTypeId,
         customerId: val.customerId,
-        morningMilk: val.morningSupply.match(/\d+/g).map(Number)[0],
-        morningUnit: val.morningSupply.split(/(\d+)/)[2].trim(),
-        afternoonMilk: val.afternoonSupply.match(/\d+/g).map(Number)[0],
-        afternoonUnit: val.afternoonSupply.split(/(\d+)/)[2].trim(),
+        morningMilk: val.morningSupply.match(/\b\d+(?:.\d+)?/)[0],
+        // morningUnit: val.morningSupply.split(/(\d+)/)[2].trim(),
+        afternoonMilk: val.afternoonSupply.match(/\b\d+(?:.\d+)?/)[0],
+        // afternoonUnit: val.afternoonSupply.split(/(\d+)/)[2].trim(),
         debitAmount: val.debit
       },
       () => {
@@ -244,7 +259,7 @@ class CustomerSupplied extends Component {
   }
   handleSubmit = e => {
     e.preventDefault();
-    showFormErrors("input,select,radio");
+    showFormErrors("input,select");
 
     const customerSupplied = {
       CreatedOn: this.state.selectedDate,
@@ -293,6 +308,28 @@ class CustomerSupplied extends Component {
             <div className="card-header-actions" />
           </CardHeader>
           <CardBody>
+            <Col lg="4">
+              <FormGroup>
+                <Label for="selectedDate">Select Date:</Label>
+                <Input
+                  type="date"
+                  name="selectedDate"
+                  id="selectedDate"
+                  placeholder="Select Date"
+                  onChange={this.handleSelectedDate}
+                  value={this.state.selectedDate}
+                  autoComplete="given-name"
+                  // valid={this.state.customerTypeId > 0}
+                  // invalid={this.state.customerTypeId == -1}
+                  required
+                  // onBlur={handleBlur}
+                />
+                {/* <FormFeedback
+                      className="invalid"
+                      id="customerTypeIdError"
+                    /> */}
+              </FormGroup>
+            </Col>
             <hr />
             <Row>
               <Col lg="6">
@@ -300,27 +337,6 @@ class CustomerSupplied extends Component {
                   // onSubmit={this.handleSubmit}
                   noValidate
                 >
-                  <FormGroup>
-                    <Label for="selectedDate">Select Date:</Label>
-                    <Input
-                      type="date"
-                      name="selectedDate"
-                      id="selectedDate"
-                      placeholder="Select Date"
-                      onChange={this.handleSelectedDate}
-                      value={this.state.selectedDate}
-                      autoComplete="given-name"
-                      // valid={this.state.customerTypeId > 0}
-                      // invalid={this.state.customerTypeId == -1}
-                      required
-                      // onBlur={handleBlur}
-                    />
-                    {/* <FormFeedback
-                      className="invalid"
-                      id="customerTypeIdError"
-                    /> */}
-                  </FormGroup>
-
                   <FormGroup>
                     <Label for="customerType">Customer Type</Label>
                     <Input
@@ -494,7 +510,7 @@ class CustomerSupplied extends Component {
                       color="primary"
                       className="mr-1"
                       onClick={this.handleSubmit}
-                      disabled={this.state.id}
+                      disabled={this.state.customerSuppliedid ? true : false}
                     >
                       {/* {isSubmitting ? "Wait..." : "Submit"} */}
                       Submit
@@ -504,7 +520,7 @@ class CustomerSupplied extends Component {
                       color="secondary"
                       className="mr-1"
                       onClick={this.handleUpdate}
-                      disabled={!this.state.id}
+                      disabled={!this.state.customerSuppliedid}
                     >
                       {/* {isSubmitting ? "Wait..." : "Update"} */}
                       Update
@@ -569,20 +585,20 @@ class CustomerSupplied extends Component {
             <Grid
               rowData={this.state.customers}
               columnDef={[
-                {
-                  headerName: "Id",
-                  field: "id",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Customer Id",
-                  field: "customerId",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
+                // {
+                //   headerName: "Id",
+                //   field: "id",
+                //   checkboxSelection: true,
+                //   editable: true,
+                //   width: 200
+                // },
+                // {
+                //   headerName: "Customer Id",
+                //   field: "customerId",
+                //   checkboxSelection: true,
+                //   editable: true,
+                //   width: 200
+                // },
                 {
                   headerName: "Customer Type",
                   field: "customerType",
