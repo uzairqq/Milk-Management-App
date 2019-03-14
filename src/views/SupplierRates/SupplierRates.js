@@ -69,6 +69,7 @@ class SupplierRates extends Component {
     e.preventDefault();
     showFormErrors("input,select");
     const supplier = {
+      CreatedOn: new Date().toDateString(),
       SupplierId: this.state.supplierId,
       CurrentRate: this.state.currentRate,
       PreviousRate: this.state.previousRate
@@ -174,7 +175,8 @@ class SupplierRates extends Component {
           id: this.state.supplierRatesId,
           SupplierId: this.state.supplierId,
           CurrentRate: this.state.currentRate,
-          PreviousRate: this.state.previousRate
+          PreviousRate: this.state.previousRate,
+          LastUpdatedOn: new Date().toDateString()
         };
         Api.put(`/SupplierRates/`, {
           ...supplier
@@ -206,14 +208,14 @@ class SupplierRates extends Component {
   }
 
   loadData() {
-    Api.get("/SupplierRates/all/")
+    Api.get("/SupplierRates/all")
       .then(res => {
         const person = res.data;
         person.forEach(i => {
           i.handleDataForUpdate = this.handleDataForUpdate;
           i.handleDelete = this.handleDelete;
         });
-        this.setState({ supplier: person });
+        this.setState({ suppliers: person });
         console.log(person);
       })
       .catch(error => console.log(error));
@@ -224,13 +226,13 @@ class SupplierRates extends Component {
   }
 
   componentDidMount() {
-    // this.loadDataDropDown();
+    this.loadDataDropDown();
     this.loadData();
   }
 
   loadDataDropDown() {
-    Api.get("/SupplierRates/customersForCustomerRatesDropdown/").then(res => {
-      this.setState({ customersDropDown: res.data });
+    Api.get("/SupplierRates/supplierDropDownAll").then(res => {
+      this.setState({ suppliersDropDown: res.data });
       console.log("Load Parent", res.data);
     });
   }
