@@ -13,7 +13,9 @@ const Supplier = React.lazy(() => import("./views/Supplier/Supplier"));
 const SupplierRates = React.lazy(() =>
   import("./views/SupplierRates/SupplierRates")
 );
-
+const SupplierSupplied = React.lazy(() =>
+  import("./views/SupplierSupplied/SupplierSupplied")
+);
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: "/", name: "Home", component: DefaultLayout, exact: true },
@@ -26,7 +28,12 @@ const routes = [
     component: CustomerSupplied
   },
   { path: "/supplier", name: "Supplier", component: Supplier },
-  { path: "/supplierRates", name: "Supplier Rates", component: SupplierRates }
+  { path: "/supplierRates", name: "Supplier Rates", component: SupplierRates },
+  {
+    path: "/supplierSupplied",
+    name: "Supplier Supplied",
+    component: SupplierSupplied
+  }
 ];
 
 export default routes;

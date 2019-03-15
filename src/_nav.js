@@ -45,6 +45,11 @@ export default {
           name: "Supplier Rates",
           url: "/supplierRates",
           icon: "icon-puzzle"
+        },
+        {
+          name: "Supplier Supplied",
+          url: "/supplierSupplied",
+          icon: "icon-puzzle"
         }
       ]
     }
