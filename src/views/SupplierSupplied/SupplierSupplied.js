@@ -21,7 +21,7 @@ import {
   clearInputsColours
 } from "../../utils/Validation";
 
-class CustomerSupplied extends Component {
+class SupplierSupplied extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -207,41 +207,32 @@ class CustomerSupplied extends Component {
 
   loadData() {
     if (this.state.selectedDate.length !== 0) {
-      Api.get("/CustomerSupplied/all/selectedDate/" + this.state.selectedDate)
+      Api.get("/SupplierSupplied/gridWithDate/date/" + this.state.selectedDate)
         .then(res => {
           const person = res.data;
           person.forEach(i => {
             i.handleDataForUpdate = this.handleDataForUpdate;
             i.handleDelete = this.handleDelete;
           });
-          this.setState({ customers: person });
+          this.setState({ suppliers: person });
           console.log(person);
         })
         .catch(error => console.log(error));
     }
   }
-  loadDataDropDown(typeId) {
-    if (typeId !== -1) {
-      Api.get(
-        "/CustomerSupplied/customerSuppliedDropDown/typeId/" +
-          typeId +
-          "/date/" +
-          this.state.selectedDate
-      ).then(res => {
-        this.setState({ customersDropDown: res.data });
-        console.log("Load Parent", res.data);
-      });
-    }
+  loadDataDropDown() {
+    Api.get("/SupplierSupplied/supplierSuppliedDropDown").then(res => {
+      this.setState({ suppliersDropDown: res.data });
+    });
   }
+
   handleIsEnabled() {
     const haveValues =
-      this.state.customerType !== -1 &&
-      this.state.customerId !== 0 &&
+      this.state.supplierId !== 0 &&
       this.state.morningMilk !== "" &&
       this.state.morningUnit !== "" &&
       this.state.afternoonMilk !== "" &&
-      this.state.afternoonUnit !== "" &&
-      this.state.debitAmount !== "";
+      this.state.afternoonUnit !== "";
     return haveValues;
   }
   handleSelectedDate(e) {
@@ -258,21 +249,19 @@ class CustomerSupplied extends Component {
     e.preventDefault();
     showFormErrors("input,select");
 
-    const customerSupplied = {
+    const supplierSupplied = {
       CreatedOn: this.state.selectedDate,
-      CustomerTypeId: this.state.customerType,
-      CustomerId: this.state.customerId,
-      MorningSupply: this.state.morningMilk + " " + this.state.morningUnit,
-      AfternoonSupply:
-        this.state.afternoonMilk + " " + this.state.afternoonUnit,
-      Debit: this.state.debitAmount
+      SupplierId: this.state.supplierId,
+      MorningPurchase: this.state.morningMilk + " " + this.state.morningUnit,
+      AfternoonPurchase:
+        this.state.afternoonMilk + " " + this.state.afternoonUnit
     };
     if (this.handleIsEnabled())
-      Api.post(`/CustomerSupplied`, {
-        ...customerSupplied
+      Api.post(`/SupplierSupplied`, {
+        ...supplierSupplied
       }).then(res => {
-        this.loadData(this.state.customerType);
-        this.loadDataDropDown(this.state.customerType);
+        this.loadData();
+        this.loadDataDropDown();
         this.initialState();
 
         if (res.data.success) {
@@ -301,7 +290,7 @@ class CustomerSupplied extends Component {
         <Card>
           <CardHeader>
             <i className="icon-note" />
-            <strong>Daily Customer Supply</strong>
+            <strong>Daily Supplier</strong>
             <div className="card-header-actions" />
           </CardHeader>
           <CardBody>
@@ -316,10 +305,7 @@ class CustomerSupplied extends Component {
                   onChange={this.handleSelectedDate}
                   value={this.state.selectedDate}
                   autoComplete="given-name"
-                  // valid={this.state.customerTypeId > 0}
-                  // invalid={this.state.customerTypeId == -1}
                   required
-                  // onBlur={handleBlur}
                 />
                 {/* <FormFeedback
                       className="invalid"
@@ -335,57 +321,27 @@ class CustomerSupplied extends Component {
                   noValidate
                 >
                   <FormGroup>
-                    <Label for="customerType">Customer Type</Label>
-                    <Input
-                      onChange={this.handleCustomerTypeChange}
-                      type="select"
-                      value={this.state.customerType}
-                      name="customerType"
-                      id="customerType"
-                      // required={true}
-                      placeholder="Customer Name"
-                      autoComplete="given-name"
-                      // valid={!errors.customerName}
-                      // invalid={touched.customerName && !!errors.customerName}
-                      // autoFocus={true}
-                      required
-                      // onBlur={handleBlur}
-                    >
-                      <option value="-1">Select Customer Type</option>
-                      {/* <option value="0">All</option> */}
-                      <option value="1">Daily</option>
-                      <option value="2">Weekly</option>
-                    </Input>
-                    <FormFeedback className="invalid" id="customerTypeError" />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="customerId">Select Customer</Label>
+                    <Label for="supplierId">Select Supplier</Label>
                     <Input
                       autoFocus
                       type="select"
-                      value={this.state.customerId}
-                      name="customerId"
-                      id="customerId"
+                      value={this.state.supplierId}
+                      name="supplierId"
+                      id="supplierId"
                       onChange={this.handleChange}
                       required={true}
                       autoComplete="family-name"
-                      // valid={!errors.customerAddress}
-                      // invalid={
-                      //   touched.customerAddress && !!errors.customerAddress
-                      // }
-                      required
-                      // onBlur={handleBlur}
                     >
-                      <option value="-1">Select Customer</option>
-                      {this.state.customersDropDown.map(function(data, key) {
+                      <option value="-1">Select Supplier</option>
+                      {this.state.suppliersDropDown.map(function(data, key) {
                         return (
-                          <option key={key} value={data.customerId}>
-                            {data.customerName}
+                          <option key={key} value={data.supplierId}>
+                            {data.supplierName}
                           </option>
                         );
                       })}
                     </Input>
-                    <FormFeedback className="invalid" id="customerIdError" />
+                    <FormFeedback className="invalid" id="supplierIdError" />
                   </FormGroup>
                   <FormGroup>
                     <Label for="morningMilk">Morning Milk</Label>
@@ -398,12 +354,6 @@ class CustomerSupplied extends Component {
                       placeholder={"Enter Morning Milk"}
                       value={this.state.morningMilk}
                       onChange={this.handleChange}
-                      // autoComplete="username"
-                      // valid={!errors.customerContact}
-                      // invalid={
-                      //   touched.customerContact && !!errors.customerContact
-                      // }
-                      // onBlur={handleBlur}
                     />
                     <FormFeedback className="invalid" id="morningMilkError" />
                   </FormGroup>
@@ -433,7 +383,6 @@ class CustomerSupplied extends Component {
                       </Label>
                     </FormGroup>
                   </FormGroup>
-                  {/* Morning Milk Unit */}
                   <FormGroup>
                     <Label for="afternoonMilk">Afternoon Milk</Label>
                     <Input
@@ -445,12 +394,6 @@ class CustomerSupplied extends Component {
                       placeholder={"Enter Afternoon Milk"}
                       value={this.state.afternoonMilk}
                       onChange={this.handleChange}
-                      // autoComplete="username"
-                      // valid={!errors.customerContact}
-                      // invalid={
-                      //   touched.customerContact && !!errors.customerContact
-                      // }
-                      // onBlur={handleBlur}
                     />
                     <FormFeedback className="invalid" id="afternoonMilkError" />
                   </FormGroup>
@@ -473,7 +416,6 @@ class CustomerSupplied extends Component {
                           type="radio"
                           name="afternoonUnit"
                           value="Mund"
-                          checked={true}
                           checked={this.state.afternoonUnit === "Mund"}
                           onChange={this.handleChange}
                         />{" "}
@@ -481,35 +423,13 @@ class CustomerSupplied extends Component {
                       </Label>
                     </FormGroup>
                   </FormGroup>
-                  {/* Afternoon Unit */}
-                  <FormGroup>
-                    <Label for="debitAmount">Debit Amount</Label>
-                    <Input
-                      type={"number"}
-                      required={true}
-                      id="debitAmount"
-                      name={"debitAmount"}
-                      title={"Debit Amount"}
-                      placeholder={"Enter Debit Amount"}
-                      value={this.state.debitAmount}
-                      onChange={this.handleChange}
-                      // autoComplete="username"
-                      // valid={!errors.customerContact}
-                      // invalid={
-                      //   touched.customerContact && !!errors.customerContact
-                      // }
-                      // onBlur={handleBlur}
-                    />
-                    <FormFeedback className="invalid" id="debitAmountError" />
-                  </FormGroup>
                   <FormGroup>
                     <Button
                       color="primary"
                       className="mr-1"
                       onClick={this.handleSubmit}
-                      disabled={this.state.customerSuppliedid ? true : false}
+                      disabled={this.state.supplierSuppliedId ? true : false}
                     >
-                      {/* {isSubmitting ? "Wait..." : "Submit"} */}
                       Submit
                     </Button>
                     <Button
@@ -517,20 +437,10 @@ class CustomerSupplied extends Component {
                       color="secondary"
                       className="mr-1"
                       onClick={this.handleUpdate}
-                      disabled={!this.state.customerSuppliedid}
+                      disabled={!this.state.supplierSuppliedId}
                     >
-                      {/* {isSubmitting ? "Wait..." : "Update"} */}
                       Update
                     </Button>
-                    {/* <Button
-                      type="button"
-                      color="success"
-                      className="mr-1"
-                      // onClick={() => this.touchAll(setTouched, errors)}
-                      // disabled={isValid}
-                    >
-                      Validate
-                    </Button> */}
                     <Button
                       type="reset"
                       color="danger"
@@ -555,24 +465,7 @@ class CustomerSupplied extends Component {
               <Col lg="6">
                 <Card className="bg-info">
                   <CardBody>
-                    <h1>Total Hotels: {this.state.customers.length}</h1>
-                    <h1>
-                      Total Daily Hotels:{" "}
-                      {
-                        this.state.customers.filter(i => i.customerTypeId === 1)
-                          .length
-                      }
-                    </h1>
-                    <h1>
-                      Total Weekly Hotels:{" "}
-                      {
-                        this.state.customers.filter(i => i.customerTypeId === 2)
-                          .length
-                      }
-                    </h1>
-                    {/* <pre>values: {JSON.stringify(values, null, 2)}</pre>
-                    <pre>errors: {JSON.stringify(errors, null, 2)}</pre>
-                    <pre>touched: {JSON.stringify(touched, null, 2)}</pre> */}
+                    <h1>Total Suppliers: {this.state.suppliers.length}</h1>
                   </CardBody>
                 </Card>
               </Col>
@@ -580,39 +473,32 @@ class CustomerSupplied extends Component {
             <hr />
             {/* {this.state.gridVisible ? ( */}
             <Grid
-              rowData={this.state.customers}
+              rowData={this.state.suppliers}
               columnDef={[
-                // {
-                //   headerName: "Id",
-                //   field: "id",
-                //   checkboxSelection: true,
-                //   editable: true,
-                //   width: 200
-                // },
-                // {
-                //   headerName: "Customer Id",
-                //   field: "customerId",
-                //   checkboxSelection: true,
-                //   editable: true,
-                //   width: 200
-                // },
                 {
-                  headerName: "Customer Type",
-                  field: "customerType",
+                  headerName: "Supplier Supplied Id",
+                  field: "id",
                   checkboxSelection: true,
                   editable: true,
                   width: 200
                 },
                 {
-                  headerName: "Customer Name",
-                  field: "customerName",
+                  headerName: "Supplier Id",
+                  field: "supplierId",
+                  checkboxSelection: true,
+                  editable: true,
+                  width: 200
+                },
+                {
+                  headerName: "Supplier Name",
+                  field: "supplierName",
                   checkboxSelection: true,
                   editable: true,
                   width: 200
                 },
                 {
                   headerName: "Morning Milk",
-                  field: "morningSupply",
+                  field: "morningPurchase",
                   checkboxSelection: true,
                   editable: true,
                   width: 200
@@ -626,7 +512,7 @@ class CustomerSupplied extends Component {
                 },
                 {
                   headerName: "Afternoon Milk",
-                  field: "afternoonSupply",
+                  field: "afternoonPurchase",
                   checkboxSelection: true,
                   editable: true,
                   width: 200
@@ -641,20 +527,6 @@ class CustomerSupplied extends Component {
                 {
                   headerName: "Rate",
                   field: "rate",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Debit",
-                  field: "debit",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Credit",
-                  field: "credit",
                   checkboxSelection: true,
                   editable: true,
                   width: 200
@@ -684,4 +556,4 @@ class CustomerSupplied extends Component {
   }
 }
 
-export default CustomerSupplied;
+export default SupplierSupplied;
