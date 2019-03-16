@@ -38,7 +38,6 @@ class SupplierSupplied extends Component {
     };
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.handleCustomerTypeChange = this.handleCustomerTypeChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.loadData = this.loadData.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
@@ -57,7 +56,6 @@ class SupplierSupplied extends Component {
       supplierId: -1,
       morningMilk: "",
       afternoonMilk: "",
-      //   debitAmount: 0,
       morningUnit: "Mund",
       afternoonUnit: "Kg"
     });
@@ -130,17 +128,7 @@ class SupplierSupplied extends Component {
     console.log("Un Updated State", this.state);
     showInputError(e.target);
   };
-  handleCustomerTypeChange(e) {
-    this.setState(
-      {
-        customerType: e.target.value
-      },
-      () => {
-        // this.loadData(this.state.customerType);
-        this.loadDataDropDown(this.state.customerType);
-      }
-    );
-  }
+
   handleDelete = customer => {
     Swal.fire({
       title: "Are you sure?",
@@ -182,22 +170,20 @@ class SupplierSupplied extends Component {
 
   handleDataForUpdate(val) {
     console.log("values", val);
-
-    var a = val.afternoonSupply.match(/(\d+)/);
+    debugger;
+    var a = val.morningPurchase.match(/\b\d+(?:.\d+)?/)[0];
     debugger;
 
     debugger;
     this.setState(
       {
         // selectedDate: val.createdOn.toString().substring(0, 10),
-        customerSuppliedid: val.id,
-        customerType: val.customerTypeId,
-        customerId: val.customerId,
-        morningMilk: val.morningSupply.match(/\b\d+(?:.\d+)?/)[0],
-        // morningUnit: val.morningSupply.split(/(\d+)/)[2].trim(),
-        afternoonMilk: val.afternoonSupply.match(/\b\d+(?:.\d+)?/)[0],
-        // afternoonUnit: val.afternoonSupply.split(/(\d+)/)[2].trim(),
-        debitAmount: val.debit
+        supplierSuppliedid: val.id,
+        supplierId: val.supplierId,
+        morningMilk: val.morningPurchase.match(/\b\d+(?:.\d+)?/)[0],
+        morningUnit: val.morningPurchase.split(/(\d+)/)[2].trim(),
+        afternoonMilk: val.afternoonPurchase.match(/\b\d+(?:.\d+)?/)[0],
+        afternoonUnit: val.afternoonPurchase.split(/(\d+)/)[2].trim()
       },
       () => {
         console.log("Update After", this.state);
@@ -206,19 +192,17 @@ class SupplierSupplied extends Component {
   }
 
   loadData() {
-    if (this.state.selectedDate.length !== 0) {
-      Api.get("/SupplierSupplied/gridWithDate/date/" + this.state.selectedDate)
-        .then(res => {
-          const person = res.data;
-          person.forEach(i => {
-            i.handleDataForUpdate = this.handleDataForUpdate;
-            i.handleDelete = this.handleDelete;
-          });
-          this.setState({ suppliers: person });
-          console.log(person);
-        })
-        .catch(error => console.log(error));
-    }
+    Api.get("/SupplierSupplied/gridWithDate/date/" + this.state.selectedDate)
+      .then(res => {
+        const person = res.data;
+        person.forEach(i => {
+          i.handleDataForUpdate = this.handleDataForUpdate;
+          i.handleDelete = this.handleDelete;
+        });
+        this.setState({ suppliers: person });
+        console.log(person);
+      })
+      .catch(error => console.log(error));
   }
   loadDataDropDown() {
     Api.get("/SupplierSupplied/supplierSuppliedDropDown").then(res => {
