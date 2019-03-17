@@ -74,24 +74,22 @@ class SupplierSupplied extends Component {
     }).then(result => {
       if (result.value) {
         debugger;
-        const customer = {
-          Id: this.state.customerSuppliedid,
-          //   CreatedOn: this.state.selectedDate,
+        const supplier = {
+          Id: this.state.supplierSuppliedId,
           LastUpdatedOn: this.state.selectedDate,
-          CustomerTypeId: this.state.customerType,
-          CustomerId: this.state.customerId,
-          MorningSupply: this.state.morningMilk + " " + this.state.morningUnit,
-          AfternoonSupply:
-            this.state.afternoonMilk + " " + this.state.afternoonUnit,
-          Debit: this.state.debitAmount
+          SupplierId: this.state.supplierId,
+          morningPurchase:
+            this.state.morningMilk + " " + this.state.morningUnit,
+          AfternoonPurchase:
+            this.state.afternoonMilk + " " + this.state.afternoonUnit
         };
-        console.log("abhi update", customer);
+        console.log("abhi update", supplier);
         debugger;
-        Api.put(`/CustomerSupplied/`, {
-          ...customer
+        Api.put(`/SupplierSupplied/`, {
+          ...supplier
         }).then(res => {
-          this.loadData(this.state.customerType);
-          this.loadDataDropDown(this.state.customerType);
+          this.loadData(this.state.selectedDate);
+          this.loadDataDropDown();
           this.initialState();
           if (res.data.success) {
             Swal.fire({
@@ -171,14 +169,9 @@ class SupplierSupplied extends Component {
   handleDataForUpdate(val) {
     console.log("values", val);
     debugger;
-    var a = val.morningPurchase.match(/\b\d+(?:.\d+)?/)[0];
-    debugger;
-
-    debugger;
     this.setState(
       {
-        // selectedDate: val.createdOn.toString().substring(0, 10),
-        supplierSuppliedid: val.id,
+        supplierSuppliedId: val.id,
         supplierId: val.supplierId,
         morningMilk: val.morningPurchase.match(/\b\d+(?:.\d+)?/)[0],
         morningUnit: val.morningPurchase.split(/(\d+)/)[2].trim(),
