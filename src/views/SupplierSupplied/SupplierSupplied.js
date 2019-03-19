@@ -20,6 +20,7 @@ import {
   showInputError,
   clearInputsColours
 } from "../../utils/Validation";
+import { MilkCounter } from "../../utils/Counters";
 
 class SupplierSupplied extends Component {
   constructor(props) {
@@ -31,10 +32,10 @@ class SupplierSupplied extends Component {
       suppliers: [],
       morningMilk: "",
       afternoonMilk: "",
-      //   debitAmount: 0,
       morningUnit: "Mund",
       afternoonUnit: "Kg",
-      selectedDate: new Date().toDateString()
+      selectedDate: new Date().toDateString(),
+      gridVisible: true
     };
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -45,14 +46,17 @@ class SupplierSupplied extends Component {
     this.handleDelete = this.handleDelete.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
     this.initialState = this.initialState.bind(this);
+    this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
+    this.Calculate = this.Calculate.bind(this);
   }
   componentDidMount() {
-    this.loadData(this.state.selectedDate);
-    this.loadDataDropDown(-1);
+    this.loadData();
+    this.loadDataDropDown();
   }
+
   initialState() {
     this.setState({
-      supplierSuppliedid: 0,
+      supplierSuppliedId: 0,
       supplierId: -1,
       morningMilk: "",
       afternoonMilk: "",
@@ -60,6 +64,41 @@ class SupplierSupplied extends Component {
       afternoonUnit: "Kg"
     });
   }
+  Calculate() {
+    debugger;
+    var e = MilkCounter(this.state.suppliers.map(i => i.morningPurchase));
+    debugger;
+    var m = 1;
+    debugger;
+    var morningMundTotal = 0;
+    var morningKgTotal = 0;
+    var a = this.state.suppliers.reduce(function(total, supplier) {
+      if (supplier.morningPurchase.includes("Mund")) {
+        if (supplier.morningPurchase.includes(".")) {
+          var splitMorning = supplier.morningPurchase.split(/([0-9.]+)/);
+          var splitKgMundMorning = splitMorning[1].split(/([0-9]+)/);
+          var morningMund = splitKgMundMorning[1];
+          var morningKg = splitKgMundMorning[3];
+          morningMundTotal = parseInt(morningMund) + morningMundTotal;
+          morningKgTotal = parseInt(morningKg) + morningKgTotal;
+        } else if (!supplier.morningPurchase.includes(".")) {
+          var splitMorning = supplier.morningPurchase.split(/([0-9]+)/);
+          var morningMund = splitMorning[1];
+          morningMundTotal = parseInt(morningMund) + morningMundTotal;
+        }
+      } else if (supplier.morningPurchase.includes("Kg")) {
+        var splitMorning = supplier.morningPurchase.split(/([0-9.]+)/);
+        var morningKg = splitMorning[1];
+        morningKgTotal = parseInt(morningKg) + morningKgTotal;
+      }
+
+      return morningMundTotal + "." + morningKgTotal;
+    }, 0);
+
+    debugger;
+    alert(morningMundTotal + "." + morningKgTotal);
+  }
+
   handleUpdate(e) {
     e.preventDefault();
     showFormErrors("input,select");
@@ -73,7 +112,6 @@ class SupplierSupplied extends Component {
       confirmButtonText: "Yes, Update it!"
     }).then(result => {
       if (result.value) {
-        debugger;
         const supplier = {
           Id: this.state.supplierSuppliedId,
           LastUpdatedOn: this.state.selectedDate,
@@ -84,11 +122,10 @@ class SupplierSupplied extends Component {
             this.state.afternoonMilk + " " + this.state.afternoonUnit
         };
         console.log("abhi update", supplier);
-        debugger;
         Api.put(`/SupplierSupplied/`, {
           ...supplier
         }).then(res => {
-          this.loadData(this.state.selectedDate);
+          this.loadData();
           this.loadDataDropDown();
           this.initialState();
           if (res.data.success) {
@@ -127,7 +164,7 @@ class SupplierSupplied extends Component {
     showInputError(e.target);
   };
 
-  handleDelete = customer => {
+  handleDelete = supplier => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -138,11 +175,11 @@ class SupplierSupplied extends Component {
       confirmButtonText: "Yes, delete it!"
     }).then(result => {
       if (result.value) {
-        Api.delete(`/CustomerSupplied/`, {
-          data: customer
+        Api.delete(`/SupplierSupplied/`, {
+          data: supplier
         }).then(res => {
-          this.loadData(this.state.customerType);
-          this.loadDataDropDown(this.state.customerType);
+          this.loadData();
+          this.loadDataDropDown();
           this.initialState();
           if (res.data.success) {
             Swal.fire({
@@ -168,7 +205,6 @@ class SupplierSupplied extends Component {
 
   handleDataForUpdate(val) {
     console.log("values", val);
-    debugger;
     this.setState(
       {
         supplierSuppliedId: val.id,
@@ -197,8 +233,11 @@ class SupplierSupplied extends Component {
       })
       .catch(error => console.log(error));
   }
-  loadDataDropDown() {
-    Api.get("/SupplierSupplied/supplierSuppliedDropDown").then(res => {
+  loadDataDropDown(date) {
+    Api.get(
+      "/SupplierSupplied/supplierSuppliedDropDown/date/" +
+        this.state.selectedDate
+    ).then(res => {
       this.setState({ suppliersDropDown: res.data });
     });
   }
@@ -219,8 +258,13 @@ class SupplierSupplied extends Component {
       },
       () => {
         this.loadData();
+        this.loadDataDropDown();
       }
     );
+  }
+  hideOrShowGrid(e) {
+    e.preventDefault();
+    this.setState({ gridVisible: !this.state.gridVisible });
   }
   handleSubmit = e => {
     e.preventDefault();
@@ -436,96 +480,104 @@ class SupplierSupplied extends Component {
                     >
                       {!this.state.gridVisible ? "Show Grid" : "Hide Grid"}
                     </Button>
+                    <Button onClick={this.Calculate}>Calculate</Button>
                   </FormGroup>
                 </Form>
               </Col>
               <Col lg="6">
                 <Card className="bg-info">
                   <CardBody>
-                    <h1>Total Suppliers: {this.state.suppliers.length}</h1>
+                    <h4>Total Suppliers: {this.state.suppliers.length}</h4>
+                    <h4>
+                      Total Amount:
+                      {this.state.suppliers.reduce(function(total, supplier) {
+                        return total + parseInt(supplier.total);
+                      }, 0)}
+                      {"/="}
+                    </h4>
+                    <h4>
+                      Total Morning:
+                      {this.state.suppliers.reduce(function(total, supplier) {
+                        return total + parseInt(supplier.morningAmount);
+                      }, 0)}
+                      {"/="}
+                    </h4>
+                    <h4>
+                      Total Afternoon:
+                      {this.state.suppliers.reduce(function(total, supplier) {
+                        return total + parseInt(supplier.afternoonAmount);
+                      }, 0)}
+                      {"/="}
+                    </h4>
                   </CardBody>
                 </Card>
               </Col>
             </Row>
             <hr />
-            {/* {this.state.gridVisible ? ( */}
-            <Grid
-              rowData={this.state.suppliers}
-              columnDef={[
-                {
-                  headerName: "Supplier Supplied Id",
-                  field: "id",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Supplier Id",
-                  field: "supplierId",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Supplier Name",
-                  field: "supplierName",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Morning Milk",
-                  field: "morningPurchase",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Morning Amount",
-                  field: "morningAmount",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Afternoon Milk",
-                  field: "afternoonPurchase",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Afternoon Amount",
-                  field: "afternoonAmount",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Rate",
-                  field: "rate",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Total",
-                  field: "total",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Actions",
-                  field: "value",
-                  cellRenderer: "childMessageRenderer",
-                  colId: "params",
-                  width: 180,
-                  editable: false
-                }
-              ]}
-            />
-            {/* ) : null} */}
+            {this.state.gridVisible ? (
+              <Grid
+                rowData={this.state.suppliers}
+                columnDef={[
+                  {
+                    headerName: "Actions",
+                    field: "value",
+                    cellRenderer: "childMessageRenderer",
+                    colId: "params",
+                    width: 180,
+                    editable: false
+                  },
+                  {
+                    headerName: "Supplier Name",
+                    field: "supplierName",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Morning Milk",
+                    field: "morningPurchase",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Morning Amount",
+                    field: "morningAmount",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Afternoon Milk",
+                    field: "afternoonPurchase",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Afternoon Amount",
+                    field: "afternoonAmount",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Rate",
+                    field: "rate",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Total",
+                    field: "total",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  }
+                ]}
+              />
+            ) : null}
           </CardBody>
         </Card>
       </div>
