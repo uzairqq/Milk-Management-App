@@ -67,36 +67,9 @@ class SupplierSupplied extends Component {
   Calculate() {
     debugger;
     var e = MilkCounter(this.state.suppliers.map(i => i.morningPurchase));
+    var d = MilkCounter(this.state.suppliers.map(i => i.afternoonPurchase));
     debugger;
     var m = 1;
-    debugger;
-    var morningMundTotal = 0;
-    var morningKgTotal = 0;
-    var a = this.state.suppliers.reduce(function(total, supplier) {
-      if (supplier.morningPurchase.includes("Mund")) {
-        if (supplier.morningPurchase.includes(".")) {
-          var splitMorning = supplier.morningPurchase.split(/([0-9.]+)/);
-          var splitKgMundMorning = splitMorning[1].split(/([0-9]+)/);
-          var morningMund = splitKgMundMorning[1];
-          var morningKg = splitKgMundMorning[3];
-          morningMundTotal = parseInt(morningMund) + morningMundTotal;
-          morningKgTotal = parseInt(morningKg) + morningKgTotal;
-        } else if (!supplier.morningPurchase.includes(".")) {
-          var splitMorning = supplier.morningPurchase.split(/([0-9]+)/);
-          var morningMund = splitMorning[1];
-          morningMundTotal = parseInt(morningMund) + morningMundTotal;
-        }
-      } else if (supplier.morningPurchase.includes("Kg")) {
-        var splitMorning = supplier.morningPurchase.split(/([0-9.]+)/);
-        var morningKg = splitMorning[1];
-        morningKgTotal = parseInt(morningKg) + morningKgTotal;
-      }
-
-      return morningMundTotal + "." + morningKgTotal;
-    }, 0);
-
-    debugger;
-    alert(morningMundTotal + "." + morningKgTotal);
   }
 
   handleUpdate(e) {
