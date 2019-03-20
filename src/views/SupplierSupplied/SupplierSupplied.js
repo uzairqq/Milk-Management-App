@@ -182,14 +182,17 @@ class SupplierSupplied extends Component {
 
   handleDataForUpdate(val) {
     console.log("values", val);
+
+    debugger;
+    var a = val.morningPurchase.split(/([0-9.]+)/)[2].trim();
     this.setState(
       {
         supplierSuppliedId: val.id,
         supplierId: val.supplierId,
-        morningMilk: val.morningPurchase.match(/\b\d+(?:.\d+)?/)[0],
-        morningUnit: val.morningPurchase.split(/(\d+)/)[2].trim(),
-        afternoonMilk: val.afternoonPurchase.match(/\b\d+(?:.\d+)?/)[0],
-        afternoonUnit: val.afternoonPurchase.split(/(\d+)/)[2].trim()
+        morningMilk: val.morningPurchase.split(/([0-9.]+)/)[1],
+        morningUnit: val.morningPurchase.split(/([0-9.]+)/)[2].trim(),
+        afternoonMilk: val.afternoonPurchase.split(/([0-9.]+)/)[1],
+        afternoonUnit: val.afternoonPurchase.split(/([0-9.]+)/)[2].trim()
       },
       () => {
         console.log("Update After", this.state);
@@ -209,9 +212,7 @@ class SupplierSupplied extends Component {
         this.setState({
           totalMorningMilk: MilkCounter(
             this.state.suppliers.map(i => i.morningPurchase)
-          )
-        });
-        this.setState({
+          ),
           totalAfternoonMilk: MilkCounter(
             this.state.suppliers.map(i => i.afternoonPurchase)
           )
@@ -222,8 +223,6 @@ class SupplierSupplied extends Component {
             this.state.totalAfternoonMilk
           )
         });
-
-        console.log(person);
       })
 
       .catch(error => console.log(error));
@@ -490,7 +489,10 @@ class SupplierSupplied extends Component {
                       }, 0)}
                       {"/="}
                     </h4>
-                    <h4>Total Morning Milk: {this.state.totalMorningMilk}</h4>
+                    <h4>
+                      Total Morning Milk: {this.state.totalMorningMilk}
+                      {"من"}
+                    </h4>
                     <h4>
                       Total Morning:{" "}
                       {this.state.suppliers.reduce(function(total, supplier) {
@@ -500,6 +502,7 @@ class SupplierSupplied extends Component {
                     </h4>
                     <h4>
                       Total Afternoon Milk: {this.state.totalAfternoonMilk}
+                      {"من"}
                     </h4>
                     <h4>
                       Total Afternoon:{" "}
@@ -508,7 +511,9 @@ class SupplierSupplied extends Component {
                       }, 0)}
                       {"/="}
                     </h4>
-                    <h4>Total Milk: {this.state.totalMilk}</h4>
+                    <h4>
+                      Total Milk: {this.state.totalMilk} {"من"}
+                    </h4>
                   </CardBody>
                 </Card>
               </Col>
