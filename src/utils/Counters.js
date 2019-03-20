@@ -60,6 +60,15 @@ export function GrandTotalMilkCounter(morningMilk, afternoonMilk) {
     } else if (!morningMilk.includes(".")) {
       mund = splitWholeValueAfternoonMilk[1];
     }
+    if (kg > 40) {
+      var kgCalc = kg % 40;
+      var mundCalc = kg / 40;
+      if (!Number.isInteger(mundCalc)) {
+        var d = Math.floor(mundCalc);
+        mund += d;
+        kg = kgCalc;
+      }
+    }
     return mund + "." + kg;
   } catch (err) {
     console.log(err);
