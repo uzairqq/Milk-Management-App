@@ -1,6 +1,5 @@
 export function MilkCounter(milks) {
   try {
-    debugger;
     var mundTotal = 0;
     var kgTotal = 0;
     var a = milks.reduce(function(total, milk) {
@@ -24,7 +23,6 @@ export function MilkCounter(milks) {
         kgTotal = parseInt(kgWithOnly) + kgTotal;
       }
     }, 0);
-    debugger;
     if (kgTotal > 40) {
       var kgCalc = kgTotal % 40;
       var mundCalc = kgTotal / 40;
@@ -35,6 +33,34 @@ export function MilkCounter(milks) {
       }
     }
     return mundTotal + "." + kgTotal;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export function GrandTotalMilkCounter(morningMilk, afternoonMilk) {
+  try {
+    var mund = 0;
+    var kg = 0;
+
+    debugger;
+    var splitWholeValueMorningMilk = morningMilk.split(/([0-9]+)/);
+    var splitWholeValueAfternoonMilk = afternoonMilk.split(/([0-9]+)/);
+
+    if (morningMilk.includes(".")) {
+      mund += parseInt(splitWholeValueMorningMilk[1]);
+      kg += parseInt(splitWholeValueMorningMilk[3]);
+    } else if (!morningMilk.includes(".")) {
+      mund = splitWholeValueMorningMilk[1];
+    }
+
+    if (afternoonMilk.includes(".")) {
+      mund += parseInt(splitWholeValueAfternoonMilk[1]);
+      kg += parseInt(splitWholeValueAfternoonMilk[3]);
+    } else if (!morningMilk.includes(".")) {
+      mund = splitWholeValueAfternoonMilk[1];
+    }
+    return mund + "." + kg;
   } catch (err) {
     console.log(err);
   }

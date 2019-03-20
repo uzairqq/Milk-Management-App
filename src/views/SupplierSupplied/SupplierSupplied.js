@@ -20,7 +20,7 @@ import {
   showInputError,
   clearInputsColours
 } from "../../utils/Validation";
-import { MilkCounter } from "../../utils/Counters";
+import { MilkCounter, GrandTotalMilkCounter } from "../../utils/Counters";
 
 class SupplierSupplied extends Component {
   constructor(props) {
@@ -35,7 +35,11 @@ class SupplierSupplied extends Component {
       morningUnit: "Mund",
       afternoonUnit: "Kg",
       selectedDate: new Date().toDateString(),
-      gridVisible: true
+      morningMilkTotal: "",
+      gridVisible: true,
+      totalMorningMilk: 0.0,
+      totalAfternoonMilk: 0.0,
+      totalMilk: 0.0
     };
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -66,10 +70,10 @@ class SupplierSupplied extends Component {
   }
   Calculate() {
     debugger;
-    var e = MilkCounter(this.state.suppliers.map(i => i.morningPurchase));
-    var d = MilkCounter(this.state.suppliers.map(i => i.afternoonPurchase));
-    debugger;
-    var m = 1;
+    GrandTotalMilkCounter(
+      this.state.totalMorningMilk,
+      this.state.totalAfternoonMilk
+    );
   }
 
   handleUpdate(e) {
@@ -202,8 +206,26 @@ class SupplierSupplied extends Component {
           i.handleDelete = this.handleDelete;
         });
         this.setState({ suppliers: person });
+        this.setState({
+          totalMorningMilk: MilkCounter(
+            this.state.suppliers.map(i => i.morningPurchase)
+          )
+        });
+        this.setState({
+          totalAfternoonMilk: MilkCounter(
+            this.state.suppliers.map(i => i.afternoonPurchase)
+          )
+        });
+        this.setState({
+          totalMilk: GrandTotalMilkCounter(
+            this.state.totalMorningMilk,
+            this.state.totalAfternoonMilk
+          )
+        });
+
         console.log(person);
       })
+
       .catch(error => console.log(error));
   }
   loadDataDropDown(date) {
@@ -462,26 +484,31 @@ class SupplierSupplied extends Component {
                   <CardBody>
                     <h4>Total Suppliers: {this.state.suppliers.length}</h4>
                     <h4>
-                      Total Amount:
+                      Total Amount:{" "}
                       {this.state.suppliers.reduce(function(total, supplier) {
                         return total + parseInt(supplier.total);
                       }, 0)}
                       {"/="}
                     </h4>
+                    <h4>Total Morning Milk: {this.state.totalMorningMilk}</h4>
                     <h4>
-                      Total Morning:
+                      Total Morning:{" "}
                       {this.state.suppliers.reduce(function(total, supplier) {
                         return total + parseInt(supplier.morningAmount);
                       }, 0)}
                       {"/="}
                     </h4>
                     <h4>
-                      Total Afternoon:
+                      Total Afternoon Milk: {this.state.totalAfternoonMilk}
+                    </h4>
+                    <h4>
+                      Total Afternoon:{" "}
                       {this.state.suppliers.reduce(function(total, supplier) {
                         return total + parseInt(supplier.afternoonAmount);
                       }, 0)}
                       {"/="}
                     </h4>
+                    <h4>Total Milk: {this.state.totalMilk}</h4>
                   </CardBody>
                 </Card>
               </Col>
