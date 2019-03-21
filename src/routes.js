@@ -16,6 +16,14 @@ const SupplierRates = React.lazy(() =>
 const SupplierSupplied = React.lazy(() =>
   import("./views/SupplierSupplied/SupplierSupplied")
 );
+const Expense = React.lazy(() => import("./views/Expense/Expense"));
+const DailyExpense = React.lazy(() =>
+  import("./views/DailyExpense/DailyExpense")
+);
+const MarketSell = React.lazy(() => import("./views/MarketSell/MarketSell"));
+const MarketPurchase = React.lazy(() =>
+  import("./views/MarketPurchase/MarketPurchase")
+);
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: "/", name: "Home", component: DefaultLayout, exact: true },
@@ -33,6 +41,26 @@ const routes = [
     path: "/supplierSupplied",
     name: "Supplier Supplied",
     component: SupplierSupplied
+  },
+  {
+    path: "/expense",
+    name: "Expense",
+    component: Expense
+  },
+  {
+    path: "/dailyExpense",
+    name: "Daily Expense",
+    component: DailyExpense
+  },
+  {
+    path: "/marketSell",
+    name: "Market Sell",
+    component: MarketSell
+  },
+  {
+    path: "/marketPurchase",
+    name: "Market Purchase",
+    component: MarketPurchase
   }
 ];
 

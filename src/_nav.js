@@ -52,6 +52,40 @@ export default {
           icon: "icon-puzzle"
         }
       ]
+    },
+    {
+      name: "Expense",
+      url: "/base",
+      icon: "icon-puzzle",
+      children: [
+        {
+          name: "New Expense",
+          url: "/expense",
+          icon: "icon-puzzle"
+        },
+        {
+          name: "Daily Expense",
+          url: "/dailyExpense",
+          icon: "icon-puzzle"
+        }
+      ]
+    },
+    {
+      name: "Market",
+      url: "/base",
+      icon: "icon-puzzle",
+      children: [
+        {
+          name: "Market Sell",
+          url: "/marketSell",
+          icon: "icon-puzzle"
+        },
+        {
+          name: "Market Purchase",
+          url: "/marketPurchase",
+          icon: "icon-puzzle"
+        }
+      ]
     }
   ]
 };
