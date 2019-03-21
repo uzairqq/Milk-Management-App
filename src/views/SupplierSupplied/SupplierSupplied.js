@@ -51,7 +51,7 @@ class SupplierSupplied extends Component {
     this.handleUpdate = this.handleUpdate.bind(this);
     this.initialState = this.initialState.bind(this);
     this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
-    this.Calculate = this.Calculate.bind(this);
+    this.Calculate = this.FastEntries.bind(this);
   }
   componentDidMount() {
     this.loadData();
@@ -68,12 +68,8 @@ class SupplierSupplied extends Component {
       afternoonUnit: "Kg"
     });
   }
-  Calculate() {
+  FastEntries() {
     debugger;
-    GrandTotalMilkCounter(
-      this.state.totalMorningMilk,
-      this.state.totalAfternoonMilk
-    );
   }
 
   handleUpdate(e) {
@@ -182,9 +178,6 @@ class SupplierSupplied extends Component {
 
   handleDataForUpdate(val) {
     console.log("values", val);
-
-    debugger;
-    var a = val.morningPurchase.split(/([0-9.]+)/)[2].trim();
     this.setState(
       {
         supplierSuppliedId: val.id,
@@ -474,7 +467,7 @@ class SupplierSupplied extends Component {
                     >
                       {!this.state.gridVisible ? "Show Grid" : "Hide Grid"}
                     </Button>
-                    <Button onClick={this.Calculate}>Calculate</Button>
+                    <Button onClick={this.FastEntries}>Fast Entries</Button>
                   </FormGroup>
                 </Form>
               </Col>
