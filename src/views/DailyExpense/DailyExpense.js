@@ -32,11 +32,10 @@ class DailyExpense extends Component {
       expenses: [],
       expenseAmount: 0,
       selectedDate: new Date().toDateString(),
-      gridVisible: false
+      gridVisible: true
     };
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.handleCustomerTypeChange = this.handleCustomerTypeChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.loadData = this.loadData.bind(this);
     this.handleDataForUpdate = this.handleDataForUpdate.bind(this);
@@ -113,28 +112,12 @@ class DailyExpense extends Component {
   }
 
   handleChange = e => {
-    this.setState(
-      {
-        [e.target.name]: e.target.value
-      },
-      () => {
-        console.log("Updated State", this.state);
-      }
-    );
-    console.log("Un Updated State", this.state);
+    this.setState({
+      [e.target.name]: e.target.value
+    });
     showInputError(e.target);
   };
-  handleCustomerTypeChange(e) {
-    this.setState(
-      {
-        customerType: e.target.value
-      },
-      () => {
-        // this.loadData(this.state.customerType);
-        this.loadDataDropDown();
-      }
-    );
-  }
+
   handleDelete = expense => {
     Swal.fire({
       title: "Are you sure?",
@@ -175,19 +158,12 @@ class DailyExpense extends Component {
   };
 
   handleDataForUpdate(val) {
-    console.log("values", val);
-    this.setState(
-      {
-        dailyExpenseId: val.id,
-        expenseID: val.expenseId,
-        expenseAmount: val.expenseAmount
-      },
-      () => {
-        console.log("Update After", this.state);
-      }
-    );
+    this.setState({
+      dailyExpenseId: val.id,
+      expenseId: val.expenseId,
+      expenseAmount: val.rate
+    });
   }
-
   loadData() {
     if (this.state.selectedDate.length !== 0) {
       Api.get("/DailyExpense/date/" + this.state.selectedDate)
@@ -204,9 +180,11 @@ class DailyExpense extends Component {
     }
   }
   loadDataDropDown() {
-    Api.get("/DailyExpense/drpdown").then(res => {
-      this.setState({ expenseDropDown: res.data });
-    });
+    Api.get("/DailyExpense/drpdown/date/" + this.state.selectedDate).then(
+      res => {
+        this.setState({ expenseDropDown: res.data });
+      }
+    );
   }
 
   handleIsEnabled() {
@@ -221,6 +199,7 @@ class DailyExpense extends Component {
       },
       () => {
         this.loadData();
+        this.loadDataDropDown();
       }
     );
   }
@@ -331,7 +310,7 @@ class DailyExpense extends Component {
                       color="primary"
                       className="mr-1"
                       onClick={this.handleSubmit}
-                      disabled={this.state.id ? true : false}
+                      disabled={this.state.dailyExpenseId ? true : false}
                     >
                       Submit
                     </Button>
@@ -340,7 +319,7 @@ class DailyExpense extends Component {
                       color="secondary"
                       className="mr-1"
                       onClick={this.handleUpdate}
-                      disabled={!this.state.id}
+                      disabled={!this.state.dailyExpenseId}
                     >
                       Update
                     </Button>
@@ -385,20 +364,6 @@ class DailyExpense extends Component {
               <Grid
                 rowData={this.state.expenses}
                 columnDef={[
-                  {
-                    headerName: "Id",
-                    field: "id",
-                    checkboxSelection: true,
-                    editable: true,
-                    width: 200
-                  },
-                  {
-                    headerName: "Expense Id",
-                    field: "expenseId",
-                    checkboxSelection: true,
-                    editable: true,
-                    width: 200
-                  },
                   {
                     headerName: "Expense Name",
                     field: "expenseName",
