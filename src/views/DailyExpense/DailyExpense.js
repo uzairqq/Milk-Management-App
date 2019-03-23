@@ -11,7 +11,11 @@ import {
   FormGroup,
   Label,
   Input,
-  Row
+  Row,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter
 } from "reactstrap";
 import Grid from "../Components/Grid";
 import Api from "../../utils/BaseUrl";
@@ -32,8 +36,16 @@ class DailyExpense extends Component {
       expenses: [],
       expenseAmount: 0,
       selectedDate: new Date().toDateString(),
-      gridVisible: true
+      gridVisible: true,
+      primary: false,
+      primaryConfirm: false,
+
+      fastEntryData: [],
+      fastEntrySelectedDate: new Date().toDateString()
     };
+    this.handleFastEntrySelectedDate = this.handleFastEntrySelectedDate.bind(
+      this
+    );
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -44,7 +56,15 @@ class DailyExpense extends Component {
     this.handleUpdate = this.handleUpdate.bind(this);
     this.initialState = this.initialState.bind(this);
     this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
+    this.fastEntries = this.fastEntries.bind(this);
+    this.fastEntry = this.fastEntry.bind(this);
+    this.getFastEntryDataOnSelectedDate = this.getFastEntryDataOnSelectedDate.bind(
+      this
+    );
+    this.fastEntryConfirm = this.fastEntryConfirm.bind(this);
+    this.handleFastEntrySubmit = this.handleFastEntrySubmit.bind(this);
   }
+
   componentDidMount() {
     this.loadData();
     this.loadDataDropDown();
@@ -56,9 +76,33 @@ class DailyExpense extends Component {
       expenseAmount: 0
     });
   }
+
+  fastEntries() {
+    alert("fast entres");
+  }
+  fastEntry() {
+    this.setState({
+      primary: !this.state.primary
+    });
+  }
+  fastEntryConfirm() {
+    this.setState({
+      primaryConfirm: !this.state.primaryConfirm
+    });
+  }
+
   hideOrShowGrid(e) {
     e.preventDefault();
     this.setState({ gridVisible: !this.state.gridVisible });
+  }
+  getFastEntryDataOnSelectedDate() {
+    debugger;
+    Api.get("/DailyExpense/date/" + this.state.fastEntrySelectedDate).then(
+      res => {
+        this.setState({ fastEntryData: res.data });
+      }
+    );
+    this.fastEntryConfirm();
   }
   handleUpdate(e) {
     e.preventDefault();
@@ -179,12 +223,19 @@ class DailyExpense extends Component {
         .catch(error => console.log(error));
     }
   }
+
   loadDataDropDown() {
     Api.get("/DailyExpense/drpdown/date/" + this.state.selectedDate).then(
       res => {
         this.setState({ expenseDropDown: res.data });
       }
     );
+  }
+  handleFastEntrySelectedDate(e) {
+    debugger;
+    this.setState({
+      fastEntrySelectedDate: e.target.value
+    });
   }
 
   handleIsEnabled() {
@@ -238,6 +289,38 @@ class DailyExpense extends Component {
         }
         clearInputsColours("input,select");
       });
+  };
+  handleFastEntrySubmit = e => {
+    debugger;
+    e.preventDefault();
+    Api.post(`/DailyExpense/ListPost`, this.state.fastEntryData)
+      .then(res => {
+        if (res.data.success) {
+          this.setState({
+            primary: false,
+            primaryConfirm: false
+          });
+          this.loadData();
+          this.loadDataDropDown();
+          this.initialState();
+          Swal.fire({
+            position: "top-end",
+            type: "success",
+            title: res.data.successMessage,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } else {
+          Swal.fire({
+            position: "top-end",
+            type: "error",
+            title: res.data.failureMessage,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+      })
+      .catch(console.log);
   };
   render() {
     return (
@@ -341,6 +424,44 @@ class DailyExpense extends Component {
                     >
                       {!this.state.gridVisible ? "Show Grid" : "Hide Grid"}
                     </Button>
+                    <Button
+                      color="primary"
+                      onClick={this.fastEntry}
+                      className="mr-1"
+                    >
+                      Fast Entries
+                    </Button>
+                    <Modal
+                      isOpen={this.state.primary}
+                      toggle={this.fastEntry}
+                      className={"modal-primary " + this.props.className}
+                    >
+                      <ModalHeader toggle={this.fastEntry}>
+                        Modal title
+                      </ModalHeader>
+                      <ModalBody>
+                        <Input
+                          type="date"
+                          name="fastEntrySelectedDate"
+                          id="fastEntrySelectedDate"
+                          placeholder="Select Date"
+                          onChange={this.handleFastEntrySelectedDate}
+                          value={this.state.fastEntrySelectedDate}
+                          autoComplete="given-name"
+                        />
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button
+                          color="primary"
+                          onClick={this.getFastEntryDataOnSelectedDate}
+                        >
+                          Get Data
+                        </Button>{" "}
+                        <Button color="secondary" onClick={this.fastEntry}>
+                          Cancel
+                        </Button>
+                      </ModalFooter>
+                    </Modal>
                   </FormGroup>
                 </Form>
               </Col>
@@ -389,6 +510,56 @@ class DailyExpense extends Component {
                 ]}
               />
             ) : null}{" "}
+            <Modal
+              isOpen={this.state.primaryConfirm}
+              toggle={this.fastEntryConfirm}
+              className={"modal-primary " + this.props.className}
+            >
+              <ModalHeader toggle={this.fastEntryConfirm}>
+                Modal title
+              </ModalHeader>
+              <ModalBody>
+                <Grid
+                  rowData={this.state.fastEntryData}
+                  columnDef={[
+                    {
+                      headerName: "Expense Name",
+                      field: "expenseName",
+                      checkboxSelection: true,
+                      editable: true,
+                      width: 200
+                    },
+                    {
+                      headerName: "Amount",
+                      field: "rate",
+                      checkboxSelection: true,
+                      editable: true,
+                      width: 200
+                    }
+                    // {
+                    //   headerName: "Actions",
+                    //   field: "value",
+                    //   cellRenderer: "childMessageRenderer",
+                    //   colId: "params",
+                    //   width: 180,
+                    //   editable: false
+                    // }
+                  ]}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="primary"
+                  disabled={this.state.fastEntryData.length === 0}
+                  onClick={this.handleFastEntrySubmit}
+                >
+                  Save This Data
+                </Button>{" "}
+                <Button color="secondary" onClick={this.fastEntryConfirm}>
+                  Cancel
+                </Button>
+              </ModalFooter>
+            </Modal>
           </CardBody>
         </Card>
       </div>
