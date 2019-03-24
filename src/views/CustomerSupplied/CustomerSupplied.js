@@ -22,6 +22,7 @@ import {
   showInputError,
   clearInputsColours
 } from "../../utils/Validation";
+import { MilkCounter, GrandTotalMilkCounter } from "../../utils/Counters";
 
 class CustomerSupplied extends Component {
   constructor(props) {
@@ -37,7 +38,11 @@ class CustomerSupplied extends Component {
       customerType: -1,
       morningUnit: "Mund",
       afternoonUnit: "Kg",
-      selectedDate: new Date().toDateString()
+      selectedDate: new Date().toDateString(),
+      gridVisible: true,
+      totalMorningMilk: 0.0,
+      totalAfternoonMilk: 0.0,
+      totalMilk: 0.0
     };
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -49,6 +54,7 @@ class CustomerSupplied extends Component {
     this.handleDelete = this.handleDelete.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
     this.initialState = this.initialState.bind(this);
+    this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
   }
   componentDidMount() {
     this.loadData(this.state.selectedDate);
@@ -192,14 +198,13 @@ class CustomerSupplied extends Component {
     debugger;
     this.setState(
       {
-        // selectedDate: val.createdOn.toString().substring(0, 10),
         customerSuppliedid: val.id,
         customerType: val.customerTypeId,
         customerId: val.customerId,
-        morningMilk: val.morningSupply.match(/\b\d+(?:.\d+)?/)[0],
-        // morningUnit: val.morningSupply.split(/(\d+)/)[2].trim(),
-        afternoonMilk: val.afternoonSupply.match(/\b\d+(?:.\d+)?/)[0],
-        // afternoonUnit: val.afternoonSupply.split(/(\d+)/)[2].trim(),
+        morningMilk: val.morningSupply.split(/([0-9.]+)/)[1],
+        morningUnit: val.morningSupply.split(/([0-9.]+)/)[2].trim(),
+        afternoonMilk: val.afternoonSupply.split(/([0-9.]+)/)[1],
+        afternoonUnit: val.afternoonSupply.split(/([0-9.]+)/)[2].trim(),
         debitAmount: val.debit
       },
       () => {
@@ -218,10 +223,28 @@ class CustomerSupplied extends Component {
             i.handleDelete = this.handleDelete;
           });
           this.setState({ customers: person });
+          this.setState({
+            totalMorningMilk: MilkCounter(
+              this.state.customers.map(i => i.morningSupply)
+            ),
+            totalAfternoonMilk: MilkCounter(
+              this.state.customers.map(i => i.afternoonSupply)
+            )
+          });
+          this.setState({
+            totalMilk: GrandTotalMilkCounter(
+              this.state.totalMorningMilk,
+              this.state.totalAfternoonMilk
+            )
+          });
           console.log(person);
         })
         .catch(error => console.log(error));
     }
+  }
+  hideOrShowGrid(e) {
+    e.preventDefault();
+    this.setState({ gridVisible: !this.state.gridVisible });
   }
   loadDataDropDown(typeId) {
     if (typeId !== -1) {
@@ -555,7 +578,7 @@ class CustomerSupplied extends Component {
                   </FormGroup>
                 </Form>
               </Col>
-              <Col lg="6">
+              {/* <Col lg="6">
                 <Card className="bg-info">
                   <CardBody>
                     <h1>Total Hotels: {this.state.customers.length}</h1>
@@ -573,113 +596,136 @@ class CustomerSupplied extends Component {
                           .length
                       }
                     </h1>
-                    {/* <pre>values: {JSON.stringify(values, null, 2)}</pre>
-                    <pre>errors: {JSON.stringify(errors, null, 2)}</pre>
-                    <pre>touched: {JSON.stringify(touched, null, 2)}</pre> */}
+                  
+                  </CardBody>
+                </Card>
+              </Col> */}
+              <Col lg="6">
+                <Card className="bg-info">
+                  <CardBody>
+                    <h4>Total Customers: {this.state.customers.length}</h4>
+                    <h4>
+                      Total Amount:{" "}
+                      {this.state.customers.reduce(function(total, customer) {
+                        return total + parseInt(customer.total);
+                      }, 0)}
+                      {"/="}
+                    </h4>
+                    <h4>
+                      Total Morning Milk: {this.state.totalMorningMilk}
+                      {"من"}
+                    </h4>
+                    <h4>
+                      Total Morning:{" "}
+                      {this.state.customers.reduce(function(total, customer) {
+                        return total + parseInt(customer.morningAmount);
+                      }, 0)}
+                      {"/="}
+                    </h4>
+                    <h4>
+                      Total Afternoon Milk: {this.state.totalAfternoonMilk}
+                      {"من"}
+                    </h4>
+                    <h4>
+                      Total Afternoon:{" "}
+                      {this.state.customers.reduce(function(total, customer) {
+                        return total + parseInt(customer.afternoonAmount);
+                      }, 0)}
+                      {"/="}
+                    </h4>
+                    <h4>
+                      Total Milk: {this.state.totalMilk} {"من"}
+                    </h4>
                   </CardBody>
                 </Card>
               </Col>
             </Row>
             <hr />
-            {/* {this.state.gridVisible ? ( */}
-            <Grid
-              rowData={this.state.customers}
-              columnDef={[
-                // {
-                //   headerName: "Id",
-                //   field: "id",
-                //   checkboxSelection: true,
-                //   editable: true,
-                //   width: 200
-                // },
-                // {
-                //   headerName: "Customer Id",
-                //   field: "customerId",
-                //   checkboxSelection: true,
-                //   editable: true,
-                //   width: 200
-                // },
-                {
-                  headerName: "Customer Type",
-                  field: "customerType",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Customer Name",
-                  field: "customerName",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Morning Milk",
-                  field: "morningSupply",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Morning Amount",
-                  field: "morningAmount",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Afternoon Milk",
-                  field: "afternoonSupply",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Afternoon Amount",
-                  field: "afternoonAmount",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Rate",
-                  field: "rate",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Debit",
-                  field: "debit",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Credit",
-                  field: "credit",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Total",
-                  field: "total",
-                  checkboxSelection: true,
-                  editable: true,
-                  width: 200
-                },
-                {
-                  headerName: "Actions",
-                  field: "value",
-                  cellRenderer: "childMessageRenderer",
-                  colId: "params",
-                  width: 180,
-                  editable: false
-                }
-              ]}
-            />
-            {/* ) : null} */}
+            {this.state.gridVisible ? (
+              <Grid
+                rowData={this.state.customers}
+                columnDef={[
+                  {
+                    headerName: "Actions",
+                    field: "value",
+                    cellRenderer: "childMessageRenderer",
+                    colId: "params",
+                    width: 180,
+                    editable: false
+                  },
+                  {
+                    headerName: "Customer Type",
+                    field: "customerType",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Customer Name",
+                    field: "customerName",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Morning Milk",
+                    field: "morningSupply",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Morning Amount",
+                    field: "morningAmount",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Afternoon Milk",
+                    field: "afternoonSupply",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Afternoon Amount",
+                    field: "afternoonAmount",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Rate",
+                    field: "rate",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Debit",
+                    field: "debit",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Credit",
+                    field: "credit",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Total",
+                    field: "total",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  }
+                ]}
+              />
+            ) : null}
           </CardBody>
         </Card>
       </div>
