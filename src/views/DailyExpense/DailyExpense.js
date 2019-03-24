@@ -293,7 +293,14 @@ class DailyExpense extends Component {
   handleFastEntrySubmit = e => {
     debugger;
     e.preventDefault();
-    Api.post(`/DailyExpense/ListPost`, this.state.fastEntryData)
+    // var params = {
+    //   date: this.state.selectedDate,
+    //   dto: this.state.fastEntryData
+    // };
+    Api.post(
+      `/DailyExpense/ListPost/date/${this.state.selectedDate}`,
+      this.state.fastEntryData
+    )
       .then(res => {
         if (res.data.success) {
           this.setState({
@@ -423,7 +430,7 @@ class DailyExpense extends Component {
                       onClick={this.hideOrShowGrid}
                     >
                       {!this.state.gridVisible ? "Show Grid" : "Hide Grid"}
-                    </Button>
+                    </Button>{" "}
                     <Button
                       color="primary"
                       onClick={this.fastEntry}
