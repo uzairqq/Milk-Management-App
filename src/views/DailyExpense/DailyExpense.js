@@ -560,7 +560,7 @@ class DailyExpense extends Component {
                   disabled={this.state.fastEntryData.length === 0}
                   onClick={this.handleFastEntrySubmit}
                 >
-                  Save This Data
+                  Save List Data
                 </Button>{" "}
                 <Button color="secondary" onClick={this.fastEntryConfirm}>
                   Cancel

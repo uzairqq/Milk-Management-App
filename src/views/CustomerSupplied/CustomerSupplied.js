@@ -11,7 +11,11 @@ import {
   FormGroup,
   Label,
   Input,
-  Row
+  Row,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  ModalFooter
 } from "reactstrap";
 import "../Customer/Customer.css";
 import Grid from "../Components/Grid";
@@ -42,7 +46,12 @@ class CustomerSupplied extends Component {
       gridVisible: true,
       totalMorningMilk: 0.0,
       totalAfternoonMilk: 0.0,
-      totalMilk: 0.0
+      totalMilk: 0.0,
+      large: false,
+      primary: false,
+      primaryConfirm: false,
+      fastEntryData: [],
+      fastEntrySelectedDate: new Date().toDateString()
     };
     this.loadDataDropDown = this.loadDataDropDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -55,6 +64,14 @@ class CustomerSupplied extends Component {
     this.handleUpdate = this.handleUpdate.bind(this);
     this.initialState = this.initialState.bind(this);
     this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
+    this.toggleLarge = this.toggleLarge.bind(this);
+    this.fastEntry = this.fastEntry.bind(this);
+    this.handleFastEntrySelectedDate = this.handleFastEntrySelectedDate.bind(
+      this
+    );
+    this.getFastEntryDataOnSelectedDate = this.getFastEntryDataOnSelectedDate.bind(
+      this
+    );
   }
   componentDidMount() {
     this.loadData(this.state.selectedDate);
@@ -71,6 +88,18 @@ class CustomerSupplied extends Component {
       afternoonUnit: "Kg"
     });
   }
+  toggleLarge() {
+    this.setState({
+      large: !this.state.large
+    });
+  }
+  handleFastEntrySelectedDate(e) {
+    debugger;
+    this.setState({
+      fastEntrySelectedDate: e.target.value
+    });
+  }
+
   handleUpdate(e) {
     e.preventDefault();
     showFormErrors("input,select");
@@ -188,30 +217,68 @@ class CustomerSupplied extends Component {
       }
     });
   };
+  getFastEntryDataOnSelectedDate() {
+    debugger;
+    Api.get(
+      "/CustomerSupplied/fastEntry/date/" + this.state.fastEntrySelectedDate
+    ).then(res => {
+      this.setState({ fastEntryData: res.data });
+    });
+    this.toggleLarge();
+  }
 
   handleDataForUpdate(val) {
-    console.log("values", val);
-
-    var a = val.afternoonSupply.match(/(\d+)/);
-    debugger;
-
-    debugger;
-    this.setState(
-      {
-        customerSuppliedid: val.id,
-        customerType: val.customerTypeId,
-        customerId: val.customerId,
-        morningMilk: val.morningSupply.split(/([0-9.]+)/)[1],
-        morningUnit: val.morningSupply.split(/([0-9.]+)/)[2].trim(),
-        afternoonMilk: val.afternoonSupply.split(/([0-9.]+)/)[1],
-        afternoonUnit: val.afternoonSupply.split(/([0-9.]+)/)[2].trim(),
-        debitAmount: val.debit
-      },
-      () => {
-        console.log("Update After", this.state);
-      }
-    );
+    this.setState({
+      customerSuppliedid: val.id,
+      customerType: val.customerTypeId,
+      customerId: val.customerId,
+      morningMilk: val.morningSupply.split(/([0-9.]+)/)[1],
+      morningUnit: val.morningSupply.split(/([0-9.]+)/)[2].trim(),
+      afternoonMilk: val.afternoonSupply.split(/([0-9.]+)/)[1],
+      afternoonUnit: val.afternoonSupply.split(/([0-9.]+)/)[2].trim(),
+      debitAmount: val.debit
+    });
   }
+  handleFastEntrySubmit = e => {
+    debugger;
+    e.preventDefault();
+    // var params = {
+    //   date: this.state.selectedDate,
+    //   dto: this.state.fastEntryData
+    // };
+    Api.post(
+      `/CustomerSupplied/ListPost/date/${this.state.selectedDate}`,
+      this.state.fastEntryData
+    )
+      .then(res => {
+        if (res.data.success) {
+          this.setState({
+            primary: false,
+            primaryConfirm: false,
+            large: false
+          });
+          this.loadData();
+          this.loadDataDropDown();
+          this.initialState();
+          Swal.fire({
+            position: "top-end",
+            type: "success",
+            title: res.data.successMessage,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } else {
+          Swal.fire({
+            position: "top-end",
+            type: "error",
+            title: res.data.failureMessage,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+      })
+      .catch(console.log);
+  };
 
   loadData() {
     if (this.state.selectedDate.length !== 0) {
@@ -237,7 +304,6 @@ class CustomerSupplied extends Component {
               this.state.totalAfternoonMilk
             )
           });
-          console.log(person);
         })
         .catch(error => console.log(error));
     }
@@ -255,7 +321,6 @@ class CustomerSupplied extends Component {
           this.state.selectedDate
       ).then(res => {
         this.setState({ customersDropDown: res.data });
-        console.log("Load Parent", res.data);
       });
     }
   }
@@ -279,6 +344,11 @@ class CustomerSupplied extends Component {
         this.loadData();
       }
     );
+  }
+  fastEntry() {
+    this.setState({
+      primary: !this.state.primary
+    });
   }
   handleSubmit = e => {
     e.preventDefault();
@@ -342,24 +412,14 @@ class CustomerSupplied extends Component {
                   onChange={this.handleSelectedDate}
                   value={this.state.selectedDate}
                   autoComplete="given-name"
-                  // valid={this.state.customerTypeId > 0}
-                  // invalid={this.state.customerTypeId == -1}
                   required
-                  // onBlur={handleBlur}
                 />
-                {/* <FormFeedback
-                      className="invalid"
-                      id="customerTypeIdError"
-                    /> */}
               </FormGroup>
             </Col>
             <hr />
             <Row>
               <Col lg="6">
-                <Form
-                  // onSubmit={this.handleSubmit}
-                  noValidate
-                >
+                <Form noValidate>
                   <FormGroup>
                     <Label for="customerType">Customer Type</Label>
                     <Input
@@ -368,17 +428,11 @@ class CustomerSupplied extends Component {
                       value={this.state.customerType}
                       name="customerType"
                       id="customerType"
-                      // required={true}
                       placeholder="Customer Name"
                       autoComplete="given-name"
-                      // valid={!errors.customerName}
-                      // invalid={touched.customerName && !!errors.customerName}
-                      // autoFocus={true}
                       required
-                      // onBlur={handleBlur}
                     >
                       <option value="-1">Select Customer Type</option>
-                      {/* <option value="0">All</option> */}
                       <option value="1">Daily</option>
                       <option value="2">Weekly</option>
                     </Input>
@@ -395,12 +449,6 @@ class CustomerSupplied extends Component {
                       onChange={this.handleChange}
                       required={true}
                       autoComplete="family-name"
-                      // valid={!errors.customerAddress}
-                      // invalid={
-                      //   touched.customerAddress && !!errors.customerAddress
-                      // }
-                      required
-                      // onBlur={handleBlur}
                     >
                       <option value="-1">Select Customer</option>
                       {this.state.customersDropDown.map(function(data, key) {
@@ -424,12 +472,6 @@ class CustomerSupplied extends Component {
                       placeholder={"Enter Morning Milk"}
                       value={this.state.morningMilk}
                       onChange={this.handleChange}
-                      // autoComplete="username"
-                      // valid={!errors.customerContact}
-                      // invalid={
-                      //   touched.customerContact && !!errors.customerContact
-                      // }
-                      // onBlur={handleBlur}
                     />
                     <FormFeedback className="invalid" id="morningMilkError" />
                   </FormGroup>
@@ -459,7 +501,6 @@ class CustomerSupplied extends Component {
                       </Label>
                     </FormGroup>
                   </FormGroup>
-                  {/* Morning Milk Unit */}
                   <FormGroup>
                     <Label for="afternoonMilk">Afternoon Milk</Label>
                     <Input
@@ -471,12 +512,6 @@ class CustomerSupplied extends Component {
                       placeholder={"Enter Afternoon Milk"}
                       value={this.state.afternoonMilk}
                       onChange={this.handleChange}
-                      // autoComplete="username"
-                      // valid={!errors.customerContact}
-                      // invalid={
-                      //   touched.customerContact && !!errors.customerContact
-                      // }
-                      // onBlur={handleBlur}
                     />
                     <FormFeedback className="invalid" id="afternoonMilkError" />
                   </FormGroup>
@@ -499,7 +534,6 @@ class CustomerSupplied extends Component {
                           type="radio"
                           name="afternoonUnit"
                           value="Mund"
-                          checked={true}
                           checked={this.state.afternoonUnit === "Mund"}
                           onChange={this.handleChange}
                         />{" "}
@@ -507,7 +541,6 @@ class CustomerSupplied extends Component {
                       </Label>
                     </FormGroup>
                   </FormGroup>
-                  {/* Afternoon Unit */}
                   <FormGroup>
                     <Label for="debitAmount">Debit Amount</Label>
                     <Input
@@ -519,12 +552,6 @@ class CustomerSupplied extends Component {
                       placeholder={"Enter Debit Amount"}
                       value={this.state.debitAmount}
                       onChange={this.handleChange}
-                      // autoComplete="username"
-                      // valid={!errors.customerContact}
-                      // invalid={
-                      //   touched.customerContact && !!errors.customerContact
-                      // }
-                      // onBlur={handleBlur}
                     />
                     <FormFeedback className="invalid" id="debitAmountError" />
                   </FormGroup>
@@ -535,7 +562,6 @@ class CustomerSupplied extends Component {
                       onClick={this.handleSubmit}
                       disabled={this.state.customerSuppliedid ? true : false}
                     >
-                      {/* {isSubmitting ? "Wait..." : "Submit"} */}
                       Submit
                     </Button>
                     <Button
@@ -545,18 +571,8 @@ class CustomerSupplied extends Component {
                       onClick={this.handleUpdate}
                       disabled={!this.state.customerSuppliedid}
                     >
-                      {/* {isSubmitting ? "Wait..." : "Update"} */}
                       Update
                     </Button>
-                    {/* <Button
-                      type="button"
-                      color="success"
-                      className="mr-1"
-                      // onClick={() => this.touchAll(setTouched, errors)}
-                      // disabled={isValid}
-                    >
-                      Validate
-                    </Button> */}
                     <Button
                       type="reset"
                       color="danger"
@@ -574,10 +590,46 @@ class CustomerSupplied extends Component {
                       onClick={this.hideOrShowGrid}
                     >
                       {!this.state.gridVisible ? "Show Grid" : "Hide Grid"}
+                    </Button>{" "}
+                    <Button
+                      color="primary"
+                      onClick={this.fastEntry}
+                      className="mr-1"
+                    >
+                      Fast Entries
                     </Button>
                   </FormGroup>
                 </Form>
               </Col>
+              <Modal
+                isOpen={this.state.primary}
+                toggle={this.fastEntry}
+                className={"modal-primary " + this.props.className}
+              >
+                <ModalHeader toggle={this.fastEntry}>Modal title</ModalHeader>
+                <ModalBody>
+                  <Input
+                    type="date"
+                    name="fastEntrySelectedDate"
+                    id="fastEntrySelectedDate"
+                    placeholder="Select Date"
+                    onChange={this.handleFastEntrySelectedDate}
+                    value={this.state.fastEntrySelectedDate}
+                    autoComplete="given-name"
+                  />
+                </ModalBody>
+                <ModalFooter>
+                  <Button
+                    color="primary"
+                    onClick={this.getFastEntryDataOnSelectedDate}
+                  >
+                    Get Data
+                  </Button>{" "}
+                  <Button color="secondary" onClick={this.fastEntry}>
+                    Cancel
+                  </Button>
+                </ModalFooter>
+              </Modal>
               {/* <Col lg="6">
                 <Card className="bg-info">
                   <CardBody>
@@ -728,6 +780,64 @@ class CustomerSupplied extends Component {
             ) : null}
           </CardBody>
         </Card>
+        {/* <Button onClick={this.toggleLarge} className="mr-1">
+          Launch large modal
+        </Button> */}
+        <Modal
+          isOpen={this.state.large}
+          toggle={this.toggleLarge}
+          className={"modal-lg " + this.props.className}
+        >
+          <ModalHeader toggle={this.toggleLarge}>Modal title</ModalHeader>
+          <ModalBody>
+            <Grid
+              rowData={this.state.fastEntryData}
+              columnDef={[
+                {
+                  headerName: "Customer Type",
+                  field: "customerType",
+                  checkboxSelection: true,
+                  editable: true,
+                  width: 200
+                },
+                {
+                  headerName: "Customer Name",
+                  field: "customerName",
+                  checkboxSelection: true,
+                  editable: true,
+                  width: 200
+                },
+                {
+                  headerName: "Morning Milk",
+                  field: "morningSupply",
+                  checkboxSelection: true,
+                  editable: true,
+                  width: 200
+                },
+                {
+                  headerName: "Afternoon Milk",
+                  field: "afternoonSupply",
+                  checkboxSelection: true,
+                  editable: true,
+                  width: 200
+                }
+              ]}
+            />
+            {/*  */}
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="primary"
+              disabled={this.state.fastEntryData.length === 0}
+              onClick={this.handleFastEntrySubmit}
+            >
+              Save List Data
+            </Button>{" "}
+            <Button color="secondary" onClick={this.toggleLarge}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Modal>
       </div>
     );
   }
