@@ -5,7 +5,6 @@ import {
   CardHeader,
   CardBody,
   Col,
-  CustomInput,
   Form,
   FormFeedback,
   FormGroup,
@@ -74,7 +73,7 @@ class CustomerSupplied extends Component {
     );
   }
   componentDidMount() {
-    this.loadData(this.state.selectedDate);
+    this.loadData();
     this.loadDataDropDown(-1);
   }
   initialState() {
@@ -116,7 +115,6 @@ class CustomerSupplied extends Component {
         debugger;
         const customer = {
           Id: this.state.customerSuppliedid,
-          //   CreatedOn: this.state.selectedDate,
           LastUpdatedOn: this.state.selectedDate,
           CustomerTypeId: this.state.customerType,
           CustomerId: this.state.customerId,
@@ -130,8 +128,8 @@ class CustomerSupplied extends Component {
         Api.put(`/CustomerSupplied/`, {
           ...customer
         }).then(res => {
-          this.loadData(this.state.customerType);
-          this.loadDataDropDown(this.state.customerType);
+          this.loadData();
+          this.loadDataDropDown();
           this.initialState();
           if (res.data.success) {
             Swal.fire({
@@ -169,12 +167,13 @@ class CustomerSupplied extends Component {
     showInputError(e.target);
   };
   handleCustomerTypeChange(e) {
+    debugger;
     this.setState(
       {
         customerType: e.target.value
       },
       () => {
-        // this.loadData(this.state.customerType);
+        this.loadData(this.state.customerType);
         this.loadDataDropDown(this.state.customerType);
       }
     );
@@ -281,8 +280,14 @@ class CustomerSupplied extends Component {
   };
 
   loadData() {
+    // /CustomerSupplied/all/selectedDate/2019-03-11//
+    debugger;
     if (this.state.selectedDate.length !== 0) {
-      Api.get("/CustomerSupplied/all/selectedDate/" + this.state.selectedDate)
+      Api.get(
+        `/CustomerSupplied/all/selectedDate/${
+          this.state.selectedDate
+        }/customerTypeId/${this.state.customerType}`
+      )
         .then(res => {
           const person = res.data;
           person.forEach(i => {
@@ -313,6 +318,7 @@ class CustomerSupplied extends Component {
     this.setState({ gridVisible: !this.state.gridVisible });
   }
   loadDataDropDown(typeId) {
+    debugger;
     if (typeId !== -1) {
       Api.get(
         "/CustomerSupplied/customerSuppliedDropDown/typeId/" +
@@ -656,6 +662,20 @@ class CustomerSupplied extends Component {
                 <Card className="bg-info">
                   <CardBody>
                     <h4>Total Customers: {this.state.customers.length}</h4>
+                    <h4>
+                      Total Daily Hotels:{" "}
+                      {
+                        this.state.customers.filter(i => i.customerTypeId === 1)
+                          .length
+                      }
+                    </h4>
+                    <h4>
+                      Total Weekly Hotels:{" "}
+                      {
+                        this.state.customers.filter(i => i.customerTypeId === 2)
+                          .length
+                      }
+                    </h4>
                     <h4>
                       Total Amount:{" "}
                       {this.state.customers.reduce(function(total, customer) {
