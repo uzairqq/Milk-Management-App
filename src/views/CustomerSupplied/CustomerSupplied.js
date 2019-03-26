@@ -688,7 +688,7 @@ class CustomerSupplied extends Component {
                       {"من"}
                     </h4>
                     <h4>
-                      Total Morning:{" "}
+                      Total Morning Amount:{" "}
                       {this.state.customers.reduce(function(total, customer) {
                         return total + parseInt(customer.morningAmount);
                       }, 0)}
@@ -699,9 +699,23 @@ class CustomerSupplied extends Component {
                       {"من"}
                     </h4>
                     <h4>
-                      Total Afternoon:{" "}
+                      Total Afternoon Amount:{" "}
                       {this.state.customers.reduce(function(total, customer) {
                         return total + parseInt(customer.afternoonAmount);
+                      }, 0)}
+                      {"/="}
+                    </h4>
+                    <h4>
+                      Total Debit Amount:{" "}
+                      {this.state.customers.reduce(function(total, customer) {
+                        return total + parseInt(customer.debit);
+                      }, 0)}
+                      {"/="}
+                    </h4>
+                    <h4>
+                      Total Credit Amount:{" "}
+                      {this.state.customers.reduce(function(total, customer) {
+                        return total + parseInt(customer.credit);
                       }, 0)}
                       {"/="}
                     </h4>
