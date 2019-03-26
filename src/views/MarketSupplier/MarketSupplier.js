@@ -61,9 +61,9 @@ class MarketSupplier extends React.Component {
   handleDataForUpdate(val) {
     this.setState({
       marketSupplierId: val.id,
-      marketSupplierName: val.name,
-      marketSupplierAddress: val.address,
-      marketSupplierContact: val.contact
+      marketSupplierName: val.marketSupplierName,
+      marketSupplierAddress: val.marketSupplierAddress,
+      marketSupplierContact: val.marketSupplierContact
     });
   }
   handleIsEnabled() {
@@ -281,7 +281,7 @@ class MarketSupplier extends React.Component {
                       color="primary"
                       className="mr-1"
                       onClick={this.handleSubmit}
-                      disabled={this.state.marketSupplierId}
+                      disabled={this.state.marketSupplierId?true:false}
                     >
                       Submit
                     </Button>
@@ -342,7 +342,7 @@ class MarketSupplier extends React.Component {
                   },
                   {
                     headerName: "Supplier Contact",
-                    field: "marketSupplier",
+                    field: "marketSupplierContact",
                     checkboxSelection: true,
                     editable: true
                   },

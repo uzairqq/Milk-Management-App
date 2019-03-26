@@ -76,6 +76,11 @@ export default {
       icon: "icon-puzzle",
       children: [
         {
+          name: "Market Supplier",
+          url: "/marketSupplier",
+          icon: "icon-puzzle"
+        },
+        {
           name: "Market Sell",
           url: "/marketSell",
           icon: "icon-puzzle"
