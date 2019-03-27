@@ -88,18 +88,18 @@ class MarketPurchase extends Component {
     }).then(result => {
       if (result.value) {
         debugger;
-        const customer = {
+        const marketPurchase = {
           Id: this.state.marketPurchaseId,
           LastUpdatedOn: this.state.selectedDate,
           MarketSupplierId: this.state.marketSupplierId,
-          MorningSupply: this.state.morningMilk + " " + this.state.morningUnit,
+          MorningPurchase: this.state.morningMilk + " " + this.state.morningUnit,
           MorningRate:this.state.morningRate,
-          AfternoonSupply:
+          AfternoonPurchase:
             this.state.afternoonMilk + " " + this.state.afternoonUnit,
             AfternoonRate:this.state.afternoonRate
         };
         Api.put(`/MarketPurchase/`, {
-          ...customer
+          ...marketPurchase
         }).then(res => {
           this.loadData();
           this.loadDataDropDown();
@@ -177,7 +177,7 @@ class MarketPurchase extends Component {
 
   handleDataForUpdate(val) {
     this.setState({
-      id: val.id,
+      marketPurchaseId: val.id,
       marketSupplierId: val.marketSupplierId,
       morningMilk: val.morningPurchase.split(/([0-9.]+)/)[1],
       morningUnit: val.morningPurchase.split(/([0-9.]+)/)[2].trim(),
@@ -193,7 +193,7 @@ class MarketPurchase extends Component {
     debugger;
     if (this.state.selectedDate.length !== 0) {
       Api.get(
-        `/MarketPurchase/all/selectedDate/${
+        `/MarketPurchase/grid/date/${
           this.state.selectedDate
         }`
       )
@@ -228,7 +228,7 @@ class MarketPurchase extends Component {
   }
   loadDataDropDown() {
       Api.get(
-        "/MarketPurchase/customerSuppliedDropDown/date/" +this.state.selectedDate
+        "/MarketPurchase/drpDownAll/date/" +this.state.selectedDate
       ).then(res => {
         this.setState({ marketSuppliersDropDown: res.data });
       });
@@ -266,9 +266,9 @@ class MarketPurchase extends Component {
     const marketPurchase = {
       CreatedOn: this.state.selectedDate,
       MarketSupplierId: this.state.marketSupplierId,
-      MorningSupply: this.state.morningMilk + " " + this.state.morningUnit,
+      MorningPurchase: this.state.morningMilk + " " + this.state.morningUnit,
       MorningRate:this.state.morningRate,
-      AfternoonSupply:
+      AfternoonPurchase:
         this.state.afternoonMilk + " " + this.state.afternoonUnit,
         AfternoonRate:this.state.afternoonRate
     };
@@ -393,7 +393,7 @@ class MarketPurchase extends Component {
                     </FormGroup>
                   </FormGroup>
                   <FormGroup>
-                    <Label for="morningMilk">Morning Rate</Label>
+                    <Label for="morningRate">Morning Rate</Label>
                     <Input
                       type={"number"}
                       required={true}
@@ -499,36 +499,15 @@ class MarketPurchase extends Component {
                   </FormGroup>
                 </Form>
               </Col>
-              {/* <Col lg="6">
-                <Card className="bg-info">
-                  <CardBody>
-                    <h1>Total Hotels: {this.state.customers.length}</h1>
-                    <h1>
-                      Total Daily Hotels:{" "}
-                      {
-                        this.state.customers.filter(i => i.customerTypeId === 1)
-                          .length
-                      }
-                    </h1>
-                    <h1>
-                      Total Weekly Hotels:{" "}
-                      {
-                        this.state.customers.filter(i => i.customerTypeId === 2)
-                          .length
-                      }
-                    </h1>
-                  
-                  </CardBody>
-                </Card>
-              </Col> */}
+              
               <Col lg="6">
                 <Card className="bg-info">
                   <CardBody>
-                    {/* <h4>Total Suppliers: {this.state.marketPurchases.length}</h4>
+                    <h4>Total Suppliers: {this.state.marketPurchases.length}</h4>
                     <h4>
                       Total Amount:{" "}
                       {this.state.marketPurchases.reduce(function(total, marketPurchase) {
-                        return total + parseInt(marketPurchase.total);
+                        return total + parseInt(marketPurchase.totalAmount);
                       }, 0)}
                       {"/="}
                     </h4>
@@ -549,14 +528,14 @@ class MarketPurchase extends Component {
                     </h4>
                     <h4>
                       Total Afternoon Amount:{" "}
-                      {this.state.customers.reduce(function(total, customer) {
+                      {this.state.marketPurchases.reduce(function(total, customer) {
                         return total + parseInt(customer.afternoonAmount);
                       }, 0)}
                       {"/="}
                     </h4>
                     <h4>
                       Total Milk: {this.state.totalMilk} {"من"}
-                    </h4> */}
+                    </h4>
                   </CardBody>
                 </Card>
               </Col>
@@ -625,7 +604,14 @@ class MarketPurchase extends Component {
                   },
                   {
                     headerName: "Total",
-                    field: "total",
+                    field: "totalAmount",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Total Milk",
+                    field: "totalMilk",
                     checkboxSelection: true,
                     editable: true,
                     width: 200
