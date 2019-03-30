@@ -63,8 +63,6 @@ class MarketSell extends Component {
     this.setState({
       marketSellId: 0,
       marketSupplierId: -1,
-      marketSuppliersDropDown: [],
-      marketSells: [],
       morningMilk: "",
       morningRate:0,
       afternoonMilk: "",
@@ -188,7 +186,7 @@ class MarketSell extends Component {
       afternoonMilk: val.afternoonSell.split(/([0-9.]+)/)[1],
       afternoonUnit: val.afternoonSell.split(/([0-9.]+)/)[2].trim(),
       afternoonRate:val.afternoonRate,
-      ComissionRate:val.commissionRate
+      commissionRate:val.comissionRate
     });
   }
   
@@ -210,10 +208,10 @@ class MarketSell extends Component {
           this.setState({ marketSells: person });
           this.setState({
             totalMorningMilk: MilkCounter(
-              this.state.marketPurchases.map(i => i.morningPurchase)
+              this.state.marketSells.map(i => i.morningSell)
             ),
             totalAfternoonMilk: MilkCounter(
-              this.state.marketPurchases.map(i => i.afternoonPurchase)
+              this.state.marketSells.map(i => i.afternoonSell)
             )
           });
           this.setState({
@@ -552,6 +550,12 @@ class MarketSell extends Component {
                     <h4>
                       Total Milk: {this.state.totalMilk} {"من"}
                     </h4>
+                    <h4>
+                      Total Commission:  {this.state.marketSells.reduce(function(total, marketSell) {
+                        return total + parseInt(marketSell.totalComission);
+                      }, 0)}
+                      {"/="}
+                    </h4>
                   </CardBody>
                 </Card>
               </Col>
@@ -614,6 +618,20 @@ class MarketSell extends Component {
                   {
                     headerName: "Afternoon Rate",
                     field: "afternoonRate",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Commission Rate",
+                    field: "comissionRate",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
+                  {
+                    headerName: "Total Commission",
+                    field: "totalComission",
                     checkboxSelection: true,
                     editable: true,
                     width: 200

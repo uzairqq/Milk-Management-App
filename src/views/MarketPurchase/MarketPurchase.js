@@ -62,8 +62,6 @@ class MarketPurchase extends Component {
     this.setState({
       marketPurchaseId: 0,
       marketSupplierId: -1,
-      marketSuppliersDropDown: [],
-      marketPurchases: [],
       morningMilk: "",
       morningRate:0,
       afternoonMilk: "",
