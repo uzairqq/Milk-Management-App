@@ -185,8 +185,8 @@ class MarketSell extends Component {
       morningMilk: val.morningSell.split(/([0-9.]+)/)[1],
       morningUnit: val.morningSell.split(/([0-9.]+)/)[2].trim(),
       morningRate:val.morningRate,
-      afternoonMilk: val.afternoonPurchase.split(/([0-9.]+)/)[1],
-      afternoonUnit: val.afternoonPurchase.split(/([0-9.]+)/)[2].trim(),
+      afternoonMilk: val.afternoonSell.split(/([0-9.]+)/)[1],
+      afternoonUnit: val.afternoonSell.split(/([0-9.]+)/)[2].trim(),
       afternoonRate:val.afternoonRate,
       ComissionRate:val.commissionRate
     });
@@ -463,18 +463,18 @@ class MarketSell extends Component {
                     <FormFeedback className="invalid" id="afternoonRateError" />
                   </FormGroup>
                   <FormGroup>
-                    <Label for="comissionRate">Commission Rate</Label>
+                    <Label for="commissionRate">Commission Rate</Label>
                     <Input
                       type={"number"}
                       required={true}
-                      id="comissionRate"
-                      name={"comissionRate"}
+                      id="commissionRate"
+                      name={"commissionRate"}
                       title={"Commission Rate"}
                       placeholder={"Enter Commission Rate"}
-                      value={this.state.comissionRate}
+                      value={this.state.commissionRate}
                       onChange={this.handleChange}
                     />
-                    <FormFeedback className="invalid" id="comissionRateError" />
+                    <FormFeedback className="invalid" id="commissionRateError" />
                   </FormGroup>
                   <FormGroup>
                     <Button
