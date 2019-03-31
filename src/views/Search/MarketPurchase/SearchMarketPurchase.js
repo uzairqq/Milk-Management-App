@@ -12,18 +12,17 @@ import {
   Input,
   Row,
 } from "reactstrap";
-import "../Customer/Customer.css";
-import Grid from "../Components/Grid";
-import Api from "../../utils/BaseUrl";
+import Grid from "../../Components/Grid";
+import Api from "../../../utils/BaseUrl";
 import Swal from "sweetalert2";
 import {
   showFormErrors,
   showInputError,
   clearInputsColours
-} from "../../utils/Validation";
-import { MilkCounter, GrandTotalMilkCounter } from "../../utils/Counters";
+} from "../../../utils/Validation";
+import { MilkCounter, GrandTotalMilkCounter } from "../../../utils/Counters";
 
-class MarketPurchase extends Component {
+class SearchMarketPurchase extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -624,4 +623,4 @@ class MarketPurchase extends Component {
   }
 }
 
-export default MarketPurchase;
+export default SearchMarketPurchase;

@@ -91,6 +91,33 @@ export default {
           icon: "icon-puzzle"
         }
       ]
+    },
+    {
+      name: "Reports",
+      url: "/base",
+      icon: "icon-puzzle",
+      children: [
+        {
+          name: "Market Purchase",
+          url: "/searchMarketPurchase",
+          icon: "icon-puzzle"
+        },
+        {
+          name: "Market Sell",
+          url: "/searchMarketSell",
+          icon: "icon-puzzle"
+        },
+        {
+          name: "Supplier",
+          url: "/searchSupplier",
+          icon: "icon-puzzle"
+        },
+        {
+          name: "Hotels",
+          url: "/searchHotel",
+          icon: "icon-puzzle"
+        }
+      ]
     }
   ]
 };
