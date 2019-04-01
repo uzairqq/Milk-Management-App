@@ -116,6 +116,11 @@ export default {
           name: "Customer",
           url: "/searchCustomer",
           icon: "icon-puzzle"
+        },
+        {
+          name: "Supplier",
+          url: "/searchSupplier",
+          icon: "icon-puzzle"
         }
       ]
     }
