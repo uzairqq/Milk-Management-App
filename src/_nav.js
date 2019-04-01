@@ -113,8 +113,8 @@ export default {
           icon: "icon-puzzle"
         },
         {
-          name: "Hotels",
-          url: "/searchHotel",
+          name: "Customer",
+          url: "/searchCustomer",
           icon: "icon-puzzle"
         }
       ]
