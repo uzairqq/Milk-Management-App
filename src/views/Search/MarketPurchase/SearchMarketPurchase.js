@@ -14,15 +14,7 @@ import {
 } from "reactstrap";
 import Grid from "../../Components/Grid";
 import Api from "../../../utils/BaseUrl";
-import Swal from "sweetalert2";
-import {
-  showFormErrors,
-  showInputError,
-  clearInputsColours
-} from "../../../utils/Validation";
 import { MilkCounter, GrandTotalMilkCounter } from "../../../utils/Counters";
-
-// React DateRangePicker
 import "react-dates/initialize";
 import { DateRangePicker } from "react-dates";
 import "react-dates/lib/css/_datepicker.css";
@@ -50,18 +42,15 @@ class SearchMarketPurchase extends Component {
   }
 
   handleChange = e => {
-    console.log(e.target.value)
     this.setState(
       {
         [e.target.name]: e.target.value
       }
-
     );
   };
 
   handleSearch(e) {
-e.preventDefault();
-// `/MarketPurchase/marketSupplierId/${this.state.marketSupplierId}/fromDate/${this.state.startDate}/toDate/${this.state.endDate}`
+    e.preventDefault();
    var startDate=this.state.startDate.utc()
    .startOf('day')
    .toISOString()
@@ -71,15 +60,9 @@ e.preventDefault();
    debugger;
       Api.get(
         `/MarketPurchase/marketSupplierId/${this.state.marketSupplierId}/fromDate/${startDate}/toDate/${endDate}`
-        
-        
       )
         .then(res => {
           const person = res.data;
-          person.forEach(i => {
-            i.handleDataForUpdate = this.handleDataForUpdate;
-            i.handleDelete = this.handleDelete;
-          });
           this.setState({ marketPurchases: person });
           this.setState({
             totalMorningMilk: MilkCounter(
@@ -109,9 +92,6 @@ e.preventDefault();
         this.setState({ marketSuppliersDropDown: res.data });
       });
     }
-
-
- 
   render() {
     return (
       <div className="animated fadeIn">
@@ -140,7 +120,6 @@ e.preventDefault();
                     this.setState({ focusedInput })
                   }
                   displayFormat="DD/MM/YYYY"
-                 
                   orientation={this.state.orientation}
                   openDirection={this.state.openDirection}
                 />
@@ -192,11 +171,10 @@ e.preventDefault();
                   </FormGroup>
                 </Form>
               </Col>
-              
               <Col lg="6">
                 <Card className="bg-info">
                   <CardBody>
-                    <h4>Total Suppliers: {this.state.marketPurchases.length}</h4>
+                    <h4>Total Days Purchased: {this.state.marketPurchases.length}</h4>
                     <h4>
                       Total Amount:{" "}
                       {this.state.marketPurchases.reduce(function(total, marketPurchase) {
@@ -233,18 +211,16 @@ e.preventDefault();
                 </Card>
               </Col>
             </Row>
-            <hr />
             {this.state.gridVisible ? (
               <Grid
                 rowData={this.state.marketPurchases}
                 columnDef={[
                   {
-                    headerName: "Actions",
-                    field: "value",
-                    cellRenderer: "childMessageRenderer",
-                    colId: "params",
-                    width: 180,
-                    editable: false
+                    headerName: "Date",
+                    field: "date",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
                   },
                   {
                     headerName: "Supplier Name",
