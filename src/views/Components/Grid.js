@@ -24,7 +24,7 @@ class Grid extends Component {
   render() {
     return (
       <div
-        style={{ height: "300px", width: "auto" }}
+        style={{ height: "500px", width: "auto" }}
         className="ag-theme-balham"
       >
         <AgGridReact

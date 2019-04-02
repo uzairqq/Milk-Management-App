@@ -24,9 +24,9 @@ class SearchSupplier extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      marketSupplierId: -1,
-      marketSuppliersDropDown: [],
-      marketSellings: [],
+      supplierId: -1,
+      suppliersDropDown: [],
+      suppliers: [],
       gridVisible: true,
       totalMorningMilk: 0.0,
       totalAfternoonMilk: 0.0,
@@ -58,17 +58,17 @@ class SearchSupplier extends Component {
    .startOf('day')
    .toISOString()
       Api.get(
-        `/MarketSell/marketSupplierId/${this.state.marketSupplierId}/fromDate/${startDate}/toDate/${endDate}`
+       `/SupplierSupplied/supplierId/${this.state.supplierId}/fromDate/${startDate}/toDate/${endDate}`
       )
         .then(res => {
           const person = res.data;
-          this.setState({ marketSellings: person });
+          this.setState({ suppliers: person });
           this.setState({
             totalMorningMilk: MilkCounter(
-              this.state.marketSellings.map(i => i.morningSell)
+              this.state.suppliers.map(i => i.morningPurchase)
             ),
             totalAfternoonMilk: MilkCounter(
-              this.state.marketSellings.map(i => i.afternoonSell)
+              this.state.suppliers.map(i => i.afternoonPurchase)
             )
           });
           this.setState({
@@ -86,9 +86,9 @@ class SearchSupplier extends Component {
   }
   loadDataDropDown() {
       Api.get(
-        "/MarketPurchase/drpDownAll/date/" +"2019-03-21"
+        "SupplierSupplied/GetDropDownForSearch"
       ).then(res => {
-        this.setState({ marketSuppliersDropDown: res.data });
+        this.setState({ suppliersDropDown: res.data });
       });
     }
   render() {
@@ -97,7 +97,7 @@ class SearchSupplier extends Component {
         <Card>
           <CardHeader>
             <i className="icon-note" />
-            <strong>Search Market Sell</strong>
+            <strong>Search Supplier Purchase</strong>
             <div className="card-header-actions" />
           </CardHeader>
           <CardBody>
@@ -127,27 +127,27 @@ class SearchSupplier extends Component {
               <Col lg="6">
                 <Form noValidate>
                   <FormGroup>
-                    <Label for="marketSupplierId">Select Market Supplier</Label>
+                    <Label for="supplierId">Select Supplier</Label>
                     <Input
                       autoFocus
                       type="select"
-                      value={this.state.marketSupplierId}
-                      name="marketSupplierId"
-                      id="marketSupplierId"
+                      value={this.state.supplierId}
+                      name="supplierId"
+                      id="supplierId"
                       onChange={this.handleChange}
                       required={true}
                       autoComplete="family-name"
                     >
-                      <option value="-1">Select Market Supplier</option>
-                      {this.state.marketSuppliersDropDown.map(function(data, key) {
+                      <option value="-1">Select Supplier</option>
+                      {this.state.suppliersDropDown.map(function(data, key) {
                         return (
-                          <option key={key} value={data.marketSupplierId}>
-                            {data.marketSupplierName}
+                          <option key={key} value={data.supplierId}>
+                            {data.supplierName}
                           </option>
                         );
                       })}
                     </Input>
-                    <FormFeedback className="invalid" id="marketSupplierIdError" />
+                    <FormFeedback className="invalid" id="supplierIdError" />
                   </FormGroup>
                   <FormGroup>
                     <Button
@@ -173,11 +173,11 @@ class SearchSupplier extends Component {
               <Col lg="6">
                 <Card className="bg-info">
                   <CardBody>
-                  <h4>Total Days Sell: {this.state.marketSellings.length}</h4>
+                  <h4>Total Days Purchased: {this.state.suppliers.length}</h4>
                     <h4>
                       Total Amount:{" "}
-                      {this.state.marketSellings.reduce(function(total, marketSell) {
-                        return total + parseInt(marketSell.totalAmount);
+                      {this.state.suppliers.reduce(function(total, supplier) {
+                        return total + parseInt(supplier.total);
                       }, 0)}
                       {"/="}
                     </h4>
@@ -186,9 +186,9 @@ class SearchSupplier extends Component {
                       {"من"}
                     </h4>
                     <h4>
-                      Total Morning Amount:{" "}
-                      {this.state.marketSellings.reduce(function(total, marketSell) {
-                        return total + parseInt(marketSell.morningAmount);
+                      Total Morning:{" "}
+                      {this.state.suppliers.reduce(function(total, supplier) {
+                        return total + parseInt(supplier.morningAmount);
                       }, 0)}
                       {"/="}
                     </h4>
@@ -197,20 +197,14 @@ class SearchSupplier extends Component {
                       {"من"}
                     </h4>
                     <h4>
-                      Total Afternoon Amount:{" "}
-                      {this.state.marketSellings.reduce(function(total, marketSell) {
-                        return total + parseInt(marketSell.afternoonAmount);
+                      Total Afternoon:{" "}
+                      {this.state.suppliers.reduce(function(total, supplier) {
+                        return total + parseInt(supplier.afternoonAmount);
                       }, 0)}
                       {"/="}
                     </h4>
                     <h4>
                       Total Milk: {this.state.totalMilk} {"من"}
-                    </h4>
-                    <h4>
-                      Total Commission:  {this.state.marketSellings.reduce(function(total, marketSell) {
-                        return total + parseInt(marketSell.totalComission);
-                      }, 0)}
-                      {"/="}
                     </h4>
                   </CardBody>
                 </Card>
@@ -218,25 +212,25 @@ class SearchSupplier extends Component {
             </Row>
             {this.state.gridVisible ? (
               <Grid
-                rowData={this.state.marketSellings}
+                rowData={this.state.suppliers}
                 columnDef={[
+                    {
+                        headerName: "Date",
+                        field: "date",
+                        checkboxSelection: true,
+                        editable: true,
+                        width: 200
+                      },
                   {
                     headerName: "Supplier Name",
-                    field: "marketSupplierName",
+                    field: "supplierName",
                     checkboxSelection: true,
                     editable: true,
                     width: 200
                   },
                   {
                     headerName: "Morning Milk",
-                    field: "morningSell",
-                    checkboxSelection: true,
-                    editable: true,
-                    width: 200
-                  },
-                  {
-                    headerName: "Morning Rate",
-                    field: "morningRate",
+                    field: "morningPurchase",
                     checkboxSelection: true,
                     editable: true,
                     width: 200
@@ -250,7 +244,7 @@ class SearchSupplier extends Component {
                   },
                   {
                     headerName: "Afternoon Milk",
-                    field: "afternoonSell",
+                    field: "afternoonPurchase",
                     checkboxSelection: true,
                     editable: true,
                     width: 200
@@ -263,36 +257,15 @@ class SearchSupplier extends Component {
                     width: 200
                   },
                   {
-                    headerName: "Afternoon Rate",
-                    field: "afternoonRate",
-                    checkboxSelection: true,
-                    editable: true,
-                    width: 200
-                  },
-                  {
-                    headerName: "Commission Rate",
-                    field: "comissionRate",
-                    checkboxSelection: true,
-                    editable: true,
-                    width: 200
-                  },
-                  {
-                    headerName: "Total Commission",
-                    field: "totalComission",
+                    headerName: "Rate",
+                    field: "rate",
                     checkboxSelection: true,
                     editable: true,
                     width: 200
                   },
                   {
                     headerName: "Total",
-                    field: "totalAmount",
-                    checkboxSelection: true,
-                    editable: true,
-                    width: 200
-                  },
-                  {
-                    headerName: "Total Milk",
-                    field: "totalMilk",
+                    field: "total",
                     checkboxSelection: true,
                     editable: true,
                     width: 200

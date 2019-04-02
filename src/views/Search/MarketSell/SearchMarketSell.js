@@ -212,6 +212,12 @@ class SearchMarketSell extends Component {
                       }, 0)}
                       {"/="}
                     </h4>
+                    <h4>
+                      Total After Comission : {this.state.marketSellings.reduce(function(total, marketSell) {
+                        return total + parseInt(marketSell.totalComission);
+                      }, 0)}
+                      {"/="}
+                    </h4>
                   </CardBody>
                 </Card>
               </Col>
@@ -220,6 +226,13 @@ class SearchMarketSell extends Component {
               <Grid
                 rowData={this.state.marketSellings}
                 columnDef={[
+                  {
+                    headerName: "Date",
+                    field: "date",
+                    checkboxSelection: true,
+                    editable: true,
+                    width: 200
+                  },
                   {
                     headerName: "Supplier Name",
                     field: "marketSupplierName",
