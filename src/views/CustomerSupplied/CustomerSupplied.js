@@ -126,6 +126,15 @@ class CustomerSupplied extends Component {
      }
      return result;     
   }
+  totalCreditAmount(){
+    var result=this.state.customers.reduce(function(total, customer) {
+      return total + parseInt(customer.credit);
+    }, 0)
+    if(this.state.customers.length>=15){
+      result=result-TotalTax;
+     }
+     return result;
+  }
 
   totalDebitCalculation(){
       var result=this.state.customers.reduce(function(total, customer) {
@@ -751,9 +760,10 @@ class CustomerSupplied extends Component {
                     </h4>
                     <h4>
                       Total Credit Amount:{" "}
-                      {this.state.customers.reduce(function(total, customer) {
+                      {/* {this.state.customers.reduce(function(total, customer) {
                         return total + parseInt(customer.credit);
-                      }, 0)}
+                      }, 0)} */}
+                      {this.totalCreditAmount()}
                       {"/="}
                     </h4>
                     <h4>
