@@ -10,7 +10,6 @@ export default class ChildMessageRenderer extends Component {
 
   GetRowDataMethod() {
     const selectedData = this.props.data;
-    console.log("Render", selectedData);
     this.props.data.handleDataForUpdate(selectedData);
   }
 

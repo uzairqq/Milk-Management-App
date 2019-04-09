@@ -140,10 +140,10 @@ class CustomerSupplied extends Component {
       var result=this.state.customers.reduce(function(total, customer) {
                         return total + parseInt(customer.debit);
                       }, 0)
-                      if(!this.state.customers.length>=15){
+                      if(this.state.customers.length>=15 ){
                         result=result-TotalTax;
                        }
-                       return result;                
+                       return Math.abs(result);                
                     
 }
 
