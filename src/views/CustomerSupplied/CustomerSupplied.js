@@ -760,10 +760,10 @@ class CustomerSupplied extends Component {
                     </h4>
                     <h4>
                       Total Credit Amount:{" "}
-                      {/* {this.state.customers.reduce(function(total, customer) {
+                      {this.state.customers.reduce(function(total, customer) {
                         return total + parseInt(customer.credit);
-                      }, 0)} */}
-                      {this.totalCreditAmount()}
+                      }, 0)}
+                      {/* {this.totalCreditAmount()} */}
                       {"/="}
                     </h4>
                     <h4>
