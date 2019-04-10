@@ -188,13 +188,16 @@ class CustomerSupplied extends Component {
           this.loadData();
           this.loadDataDropDown();
           this.initialState();
+          this.setState({
+            largeEdit:false
+          })
           if (res.data.success) {
             Swal.fire({
               position: "top-end",
               type: "success",
               title: res.data.successMessage,
               showConfirmButton: false,
-              timer: 2000
+              timer: 1000
             });
           } else {
             Swal.fire({
@@ -202,8 +205,11 @@ class CustomerSupplied extends Component {
               type: "error",
               title: res.data.failureMessage,
               showConfirmButton: false,
-              timer: 2000
+              timer: 1000
             });
+            this.setState({
+              largeEdit:true
+            })
           }
           clearInputsColours("input,select");
         });
@@ -619,7 +625,7 @@ class CustomerSupplied extends Component {
                     >
                       Submit
                     </Button>
-                    <Button
+                    {/* <Button
                       type="submit"
                       color="secondary"
                       className="mr-1"
@@ -627,7 +633,7 @@ class CustomerSupplied extends Component {
                       disabled={!this.state.customerSuppliedid}
                     >
                       Update
-                    </Button>
+                    </Button> */}
                     <Button
                       type="reset"
                       color="danger"
@@ -935,21 +941,133 @@ class CustomerSupplied extends Component {
                   className={"modal-lg " + this.props.className}
                 >
                   <ModalHeader toggle={this.toggleLargeForEdit}>
-                    Modal title
+                    Edit Daily Customer Supply
                   </ModalHeader>
                   <ModalBody>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                    sed do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                    Duis aute irure dolor in reprehenderit in voluptate velit
-                    esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-                    occaecat cupidatat non proident, sunt in culpa qui officia
-                    deserunt mollit anim id est laborum.
+                  <FormGroup>
+                    <Label for="customerId">Select Customer</Label>
+                    <Input
+                      autoFocus
+                      type="select"
+                      value={this.state.customerId}
+                      name="customerId"
+                      id="customerId"
+                      onChange={this.handleChange}
+                      required={true}
+                      autoComplete="family-name"
+                    >
+                      <option value="-1">Select Customer</option>
+                      {this.state.customersDropDown.map(function(data, key) {
+                        return (
+                          <option key={key} value={data.customerId}>
+                            {data.customerName}
+                          </option>
+                        );
+                      })}
+                    </Input>
+                    <FormFeedback className="invalid" id="customerIdError" />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="morningMilk">Morning Milk</Label>
+                    <Input
+                      type={"number"}
+                      required={true}
+                      id="morningMilk"
+                      name={"morningMilk"}
+                      title={"Morning Milk"}
+                      placeholder={"Enter Morning Milk"}
+                      value={this.state.morningMilk}
+                      onChange={this.handleChange}
+                    />
+                    <FormFeedback className="invalid" id="morningMilkError" />
+                  </FormGroup>
+                  <FormGroup tag="fieldset">
+                    <FormGroup check inline>
+                      <Label check>
+                        <Input
+                          type="radio"
+                          name="morningUnit"
+                          checked={this.state.morningUnit === "Kg"}
+                          value="Kg"
+                          onChange={this.handleChange}
+                        />{" "}
+                        Kg
+                      </Label>
+                    </FormGroup>
+                    <FormGroup check inline>
+                      <Label check>
+                        <Input
+                          type="radio"
+                          name="morningUnit"
+                          value="Mund"
+                          checked={this.state.morningUnit === "Mund"}
+                          onChange={this.handleChange}
+                        />{" "}
+                        Mund
+                      </Label>
+                    </FormGroup>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="afternoonMilk">Afternoon Milk</Label>
+                    <Input
+                      type={"number"}
+                      required={true}
+                      name={"afternoonMilk"}
+                      id="afternoonMilk"
+                      title={"Afternoon Milk"}
+                      placeholder={"Enter Afternoon Milk"}
+                      value={this.state.afternoonMilk}
+                      onChange={this.handleChange}
+                    />
+                    <FormFeedback className="invalid" id="afternoonMilkError" />
+                  </FormGroup>
+                  <FormGroup tag="fieldset">
+                    <FormGroup check inline>
+                      <Label check>
+                        <Input
+                          type="radio"
+                          name="afternoonUnit"
+                          value="Kg"
+                          checked={this.state.afternoonUnit === "Kg"}
+                          onChange={this.handleChange}
+                        />{" "}
+                        Kg
+                      </Label>
+                    </FormGroup>
+                    <FormGroup check inline>
+                      <Label check>
+                        <Input
+                          type="radio"
+                          name="afternoonUnit"
+                          value="Mund"
+                          checked={this.state.afternoonUnit === "Mund"}
+                          onChange={this.handleChange}
+                        />{" "}
+                        Mund
+                      </Label>
+                    </FormGroup>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="debitAmount">Debit Amount</Label>
+                    <Input
+                      type={"number"}
+                      required={true}
+                      id="debitAmount"
+                      name={"debitAmount"}
+                      title={"Debit Amount"}
+                      placeholder={"Enter Debit Amount"}
+                      value={this.state.debitAmount}
+                      onChange={this.handleChange}
+                    />
+                    <FormFeedback className="invalid" id="debitAmountError" />
+                  </FormGroup>
                   </ModalBody>
                   <ModalFooter>
                     <Button color="primary" onClick={this.toggleLargeForEdit}>
-                      Do Something
+                      Clear Payment
+                    </Button>{" "}
+                    <Button color="primary" onClick={this.handleUpdate}>
+                     Update
                     </Button>{" "}
                     <Button color="secondary" onClick={this.toggleLargeForEdit}>
                       Cancel
