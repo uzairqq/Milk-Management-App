@@ -48,6 +48,7 @@ class CustomerSupplied extends Component {
       totalAfternoonMilk: 0.0,
       totalMilk: 0.0,
       large: false,
+      largeEdit:false,
       primary: false,
       primaryConfirm: false,
       fastEntryData: [],
@@ -65,6 +66,7 @@ class CustomerSupplied extends Component {
     this.initialState = this.initialState.bind(this);
     this.hideOrShowGrid = this.hideOrShowGrid.bind(this);
     this.toggleLarge = this.toggleLarge.bind(this);
+    this.toggleLargeForEdit = this.toggleLargeForEdit.bind(this);
     this.fastEntry = this.fastEntry.bind(this);
     this.handleFastEntrySelectedDate = this.handleFastEntrySelectedDate.bind(
       this
@@ -91,6 +93,11 @@ class CustomerSupplied extends Component {
   toggleLarge() {
     this.setState({
       large: !this.state.large
+    });
+  }
+  toggleLargeForEdit() {
+    this.setState({
+      largeEdit: !this.state.largeEdit
     });
   }
   handleFastEntrySelectedDate(e) {
@@ -284,7 +291,8 @@ class CustomerSupplied extends Component {
       morningUnit: val.morningSupply.split(/([0-9.]+)/)[2].trim(),
       afternoonMilk: val.afternoonSupply.split(/([0-9.]+)/)[1],
       afternoonUnit: val.afternoonSupply.split(/([0-9.]+)/)[2].trim(),
-      debitAmount: val.debit
+      debitAmount: val.debit,
+      largeEdit:true
     });
   }
   handleFastEntrySubmit = e => {
@@ -919,6 +927,35 @@ class CustomerSupplied extends Component {
             </Button>
           </ModalFooter>
         </Modal>
+        {/* /Edit Modal/ */}
+        
+                <Modal
+                  isOpen={this.state.largeEdit}
+                  toggle={this.toggleLargeForEdit}
+                  className={"modal-lg " + this.props.className}
+                >
+                  <ModalHeader toggle={this.toggleLargeForEdit}>
+                    Modal title
+                  </ModalHeader>
+                  <ModalBody>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                    sed do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Duis aute irure dolor in reprehenderit in voluptate velit
+                    esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+                    occaecat cupidatat non proident, sunt in culpa qui officia
+                    deserunt mollit anim id est laborum.
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="primary" onClick={this.toggleLargeForEdit}>
+                      Do Something
+                    </Button>{" "}
+                    <Button color="secondary" onClick={this.toggleLargeForEdit}>
+                      Cancel
+                    </Button>
+                  </ModalFooter>
+                </Modal>
       </div>
     );
   }
