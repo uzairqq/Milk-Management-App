@@ -39,6 +39,7 @@ class CustomerSupplied extends Component {
       morningMilk: "",
       afternoonMilk: "",
       debitAmount: 0,
+      creditAmount:0,
       customerType: -1,
       morningUnit: "Mund",
       afternoonUnit: "Kg",
@@ -74,6 +75,7 @@ class CustomerSupplied extends Component {
     this.getFastEntryDataOnSelectedDate = this.getFastEntryDataOnSelectedDate.bind(
       this
     );
+    this.handleClearPaymentFastInEdit=this.handleClearPaymentFastInEdit.bind(this);
   }
   componentDidMount() {
     this.loadData();
@@ -99,12 +101,76 @@ class CustomerSupplied extends Component {
     this.setState({
       largeEdit: !this.state.largeEdit
     });
+    this.initialState();
   }
   handleFastEntrySelectedDate(e) {
     debugger;
     this.setState({
       fastEntrySelectedDate: e.target.value
     });
+  }
+  handleClearPaymentFastInEdit(e){
+console.log("Clicked")
+e.preventDefault();
+showFormErrors("input,select");
+Swal.fire({
+  title: "Are you sure?",
+  text: "You won't be able to revert this!",
+  type: "warning",
+  showCancelButton: true,
+  confirmButtonColor: "#3085d6",
+  cancelButtonColor: "#d33",
+  confirmButtonText: "Yes, Clear Payment!"
+}).then(result => {
+  if (result.value) {
+    debugger;
+    const customer = {
+      Id: this.state.customerSuppliedid,
+      LastUpdatedOn: this.state.selectedDate,
+      CustomerTypeId: this.state.customerType,
+      CustomerId: this.state.customerId,
+      MorningSupply: this.state.morningMilk + " " + this.state.morningUnit,
+      AfternoonSupply:
+        this.state.afternoonMilk + " " + this.state.afternoonUnit,
+      Debit: this.state.creditAmount
+    };
+    
+    console.log("abhi update", customer);
+    debugger;
+    Api.put(`/CustomerSupplied/`, {
+      ...customer
+    }).then(res => {
+      this.loadData();
+      this.loadDataDropDown();
+      this.initialState();
+      this.setState({
+        largeEdit:false
+      })
+      if (res.data.success) {
+        Swal.fire({
+          position: "top-end",
+          type: "success",
+          title: res.data.successMessage,
+          showConfirmButton: false,
+          timer: 1000
+        });
+      } else {
+        Swal.fire({
+          position: "top-end",
+          type: "error",
+          title: res.data.failureMessage,
+          showConfirmButton: false,
+          timer: 1000
+        });
+        this.setState({
+          largeEdit:true
+        })
+      }
+      clearInputsColours("input,select");
+    });
+  }
+});
+
   }
   totalMilkCalculation(){
     var b= this.state.customers.reduce(function(total, customer) {
@@ -298,6 +364,7 @@ class CustomerSupplied extends Component {
       afternoonMilk: val.afternoonSupply.split(/([0-9.]+)/)[1],
       afternoonUnit: val.afternoonSupply.split(/([0-9.]+)/)[2].trim(),
       debitAmount: val.debit,
+      creditAmount:val.credit,
       largeEdit:true
     });
   }
@@ -1063,7 +1130,7 @@ class CustomerSupplied extends Component {
                   </FormGroup>
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="primary" onClick={this.toggleLargeForEdit}>
+                    <Button color="primary" onClick={this.handleClearPaymentFastInEdit}>
                       Clear Payment
                     </Button>{" "}
                     <Button color="primary" onClick={this.handleUpdate}>
