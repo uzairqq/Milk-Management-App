@@ -39,7 +39,7 @@ class CustomerSupplied extends Component {
       morningMilk: "",
       afternoonMilk: "",
       debitAmount: 0,
-      creditAmount:0,
+      totalAmount:0,
       customerType: -1,
       morningUnit: "Mund",
       afternoonUnit: "Kg",
@@ -132,9 +132,9 @@ Swal.fire({
       MorningSupply: this.state.morningMilk + " " + this.state.morningUnit,
       AfternoonSupply:
         this.state.afternoonMilk + " " + this.state.afternoonUnit,
-      Debit: this.state.creditAmount
+      Debit: this.state.totalAmount
     };
-    
+
     console.log("abhi update", customer);
     debugger;
     Api.put(`/CustomerSupplied/`, {
@@ -364,7 +364,7 @@ Swal.fire({
       afternoonMilk: val.afternoonSupply.split(/([0-9.]+)/)[1],
       afternoonUnit: val.afternoonSupply.split(/([0-9.]+)/)[2].trim(),
       debitAmount: val.debit,
-      creditAmount:val.credit,
+      totalAmount:val.total,
       largeEdit:true
     });
   }
