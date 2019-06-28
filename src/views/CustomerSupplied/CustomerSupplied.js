@@ -26,7 +26,6 @@ import {
   clearInputsColours
 } from "../../utils/Validation";
 import { MilkCounter, GrandTotalMilkCounter } from "../../utils/Counters";
-import {TotalTax,MorningTax,AfternoonTax} from '../../utils/Taxes';
 
 class CustomerSupplied extends Component {
   constructor(props) {
@@ -172,53 +171,53 @@ Swal.fire({
 });
 
   }
-  totalMilkCalculation(){
-    var b= this.state.customers.reduce(function(total, customer) {
-      return total + parseInt(customer.total);
-    }, 0);
-    if(this.state.customers.length>=15){
-     b=b-TotalTax;
-    }
-    return b;
-  }
-  totalMorningAmountCalculation(){
-   var result= this.state.customers.reduce(function(total, customer) {
-      return  total + parseInt(customer.morningAmount);
-    }, 0)
-    if(this.state.customers.length>=15){
-      result=result-MorningTax;
-     }
-     return result;  
-  }
-  totalAfterAmountCalculation(){
-    var result=this.state.customers.reduce(function(total, customer) {
-      return total + parseInt(customer.afternoonAmount);
-    }, 0)
-    if(this.state.customers.length>=15){
-      result=result-AfternoonTax;
-     }
-     return result;     
-  }
-  totalCreditAmount(){
-    var result=this.state.customers.reduce(function(total, customer) {
-      return total + parseInt(customer.credit);
-    }, 0)
-    if(this.state.customers.length>=15){
-      result=result-TotalTax;
-     }
-     return result;
-  }
+  // totalMilkCalculation(){
+  //   var b= this.state.customers.reduce(function(total, customer) {
+  //     return total + parseInt(customer.total);
+  //   }, 0);
+  //   if(this.state.customers.length>=15){
+  //    b=b-TotalTax;
+  //   }
+  //   return b;
+  // }
+  // totalMorningAmountCalculation(){
+  //  var result= this.state.customers.reduce(function(total, customer) {
+  //     return  total + parseInt(customer.morningAmount);
+  //   }, 0)
+  //   if(this.state.customers.length>=15){
+  //     result=result-MorningTax;
+  //    }
+  //    return result;  
+  // }
+  // totalAfterAmountCalculation(){
+  //   var result=this.state.customers.reduce(function(total, customer) {
+  //     return total + parseInt(customer.afternoonAmount);
+  //   }, 0)
+  //   if(this.state.customers.length>=15){
+  //     result=result-AfternoonTax;
+  //    }
+  //    return result;     
+  // }
+  // totalCreditAmount(){
+  //   var result=this.state.customers.reduce(function(total, customer) {
+  //     return total + parseInt(customer.credit);
+  //   }, 0)
+  //   if(this.state.customers.length>=15){
+  //     result=result-TotalTax;
+  //    }
+  //    return result;
+  // }
 
-  totalDebitCalculation(){
-      var result=this.state.customers.reduce(function(total, customer) {
-                        return total + parseInt(customer.debit);
-                      }, 0)
-                      if(this.state.customers.length>=15 ){
-                        result=result-TotalTax;
-                       }
-                       return Math.abs(result);                
+//   totalDebitCalculation(){
+//       var result=this.state.customers.reduce(function(total, customer) {
+//                         return total + parseInt(customer.debit);
+//                       }, 0)
+//                       if(this.state.customers.length>=15 ){
+//                         result=result-TotalTax;
+//                        }
+//                        return Math.abs(result);                
                     
-}
+// }
 
   
 
@@ -801,10 +800,10 @@ Swal.fire({
                     <h4>
                       Total Amount:{" "}
                       
-                      {/* {this.state.customers.reduce(function(total, customer) {
+                      {this.state.customers.reduce(function(total, customer) {
                         return total + parseInt(customer.total);
-                      }, 0)} */}
-                      {this.totalMilkCalculation()}
+                      }, 0)}
+                      {/* {this.totalMilkCalculation()} */}
                       {"/="}
                     </h4>
                     <h4>
@@ -813,10 +812,10 @@ Swal.fire({
                     </h4>
                     <h4>
                       Total Morning Amount:{" "}
-                      {/* {this.state.customers.reduce(function(total, customer) {
+                      {this.state.customers.reduce(function(total, customer) {
                         return  total + parseInt(customer.morningAmount);
-                      }, 0)} */}
-                      {this.totalMorningAmountCalculation()}
+                      }, 0)}
+                      {/* {this.totalMorningAmountCalculation()} */}
                       {"/="}
                     </h4>
                     <h4>
@@ -833,10 +832,10 @@ Swal.fire({
                     </h4>
                     <h4>
                       Total Debit Amount:{" "}
-                      {/* {this.state.customers.reduce(function(total, customer) {
+                      {this.state.customers.reduce(function(total, customer) {
                         return total + parseInt(customer.debit);
-                      }, 0)} */}
-                      {this.totalDebitCalculation()}
+                      }, 0)}
+                      {/* {this.totalDebitCalculation()} */}
                       {"/="}
                     </h4>
                     <h4>
