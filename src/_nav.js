@@ -123,6 +123,23 @@ export default {
           icon: "icon-puzzle"
         }
       ]
+    },
+    {
+      name: "Ledger",
+      url: "/base",
+      icon: "icon-puzzle",
+      children: [
+        {
+          name: "Ledger",
+          url: "/ledger",
+          icon: "icon-puzzle"
+        }
+        // {
+        //   name: "LedgerToAndFromDate", // in future 
+        //   url: "/searchMarketSell",
+        //   icon: "icon-puzzle"
+        // },
+      ]
     }
   ]
 };

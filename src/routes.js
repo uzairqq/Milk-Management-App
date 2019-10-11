@@ -39,6 +39,11 @@ const SearchCustomer = React.lazy(() =>
 const SearchSupplier = React.lazy(() =>
   import("./views/Search/Supplier/SearchSupplier")
 );
+
+const Ledger = React.lazy(() =>
+  import("./views/Ledger/Ledger")
+);
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: "/", name: "Home", component: DefaultLayout, exact: true },
@@ -101,7 +106,15 @@ const routes = [
     path: "/searchSupplier",
     name: "Search Supplier",
     component: SearchSupplier
-  }
+  },
+  {
+    path: "/ledger",
+    name: "Ledger",
+    component: Ledger
+  },
+
+
+  Ledger
 ];
 
 export default routes;
